@@ -1,0 +1,283 @@
+from typing import Any
+from fxdc.parsedata.lexer import *
+from fxdc.parsedata import FxDCObject
+from fxdc.exceptions import InvalidData
+from fxdc.config import Config
+
+## NODES
+
+BASIC_TYPES = [
+    'str',
+    'int',
+    'bool',
+    'list',
+    'dict',
+]
+
+class Parser:
+    def __init__(self, tokens:list[Token]) -> None:
+        self.tokens = tokens
+        self.pos = -1
+        self.current_token = None
+        self.advance()
+        
+    def advance(self):
+        self.pos += 1
+        if self.pos < len(self.tokens):
+            self.current_token = self.tokens[self.pos]
+        print(self.current_token)
+        return self.current_token
+    
+    def get_indent_count(self):
+        count = 0
+        while self.current_token.type == TT_INDENT:
+            count += 1
+            self.advance()
+        
+        return count
+    
+    def parse(self):
+        obj = FxDCObject()
+        while self.current_token.type != TT_EOF:
+            while self.current_token.type == TT_NEWLINE:
+                self.advance()
+            if self.current_token.type == TT_INDENT:
+                self.advance()
+                if self.current_token.type not in (TT_EOF, TT_NEWLINE):
+                    raise InvalidData(f"Unexpected indent")
+            if self.current_token.type == TT_EOF:
+                break
+            if self.current_token.type != TT_IDENTIFIER:
+                raise InvalidData(f"Expected identifier, got {self.current_token}")
+            key = self.current_token.value
+            type_ = None
+            self.advance()
+            if self.current_token.type == TT_DEVIDER:
+                self.advance()
+                if self.current_token.type != TT_KEYWORD:
+                    raise InvalidData(f"Expected keyword class, got {self.current_token}")
+                type_ = self.current_token.value
+                self.advance()
+            
+            if self.current_token.type not in  (TT_EQUAL, TT_COLON):
+                raise InvalidData(f"Expected equal sign/colon, got {self.current_token}")
+            
+            if self.current_token.type == TT_COLON:
+                self.advance()
+                if self.current_token.type != TT_NEWLINE:
+                    raise InvalidData(f"Expected new line, got {self.current_token}")
+                self.advance()
+                indentcount = self.get_indent_count()
+                print(indentcount)
+                if indentcount == 0:
+                    raise InvalidData(f"Expected indented block, got {self.current_token}")
+                newobj = self.parse_indented(indentcount)
+                value = newobj.__dict__
+                if not type_:
+                    obj.__setattr__(key, value)
+                elif type_ == 'list':
+                    l = []
+                    for v in value:
+                        l.append(value[v])
+                    obj.__setattr__(key, l)
+                elif type_ == 'dict':
+                    obj.__setattr__(key, value)
+                else:
+                    class_ = Config.__getattribute__(type_)
+                    if not class_:
+                        raise InvalidData(f"Invalid class type {type_}")
+                    try:
+                        obj.from_data(**value)
+                    except AttributeError:
+                        try:
+                            obj.__setattr__(key, class_(**value))
+                        except TypeError:
+                            raise InvalidData(f"Invalid arguments for class {type_}")
+                    except TypeError:
+                        raise InvalidData(f"Invalid arguments for class {type_}")
+            else:
+                self.advance()
+                
+                if self.current_token.type not in (TT_STRING, TT_NUMBER, TT_FLOAT):
+                    raise InvalidData(f"Expected value, got {self.current_token}")
+            
+                value = self.current_token.value
+                if type_:
+                    if type_ == 'str':
+                        if not self.current_token.type == TT_STRING:
+                            raise InvalidData(f"Expected string, got {self.current_token.type}")
+                        value = str(value)
+                    elif type_ == 'int':
+                        if not self.current_token.type == TT_NUMBER:
+                            raise InvalidData(f"Expected number, got {self.current_token.type}")
+                        try:
+                            value = int(value)
+                        except ValueError:
+                            raise InvalidData(f"Invalid value for int type")
+                    elif type_ == 'float':
+                        if not self.current_token.type == TT_FLOAT:
+                            raise InvalidData(f"Expected float, got {self.current_token.type}")
+                        try:
+                            value = float(value)
+                        except ValueError:
+                            raise InvalidData(f"Invalid value for float type")
+                    elif type_ == 'bool':
+                        if self.current_token.type in ("True", 1):
+                            value = True
+                        elif self.current_token.type in ("False", 0):
+                            value = False
+                        elif self.current_token.value in ("None", "Null"):
+                            value = None
+                        else:
+                            raise InvalidData(f"Invalid value for bool type")
+                    else:
+                        class_ = Config.__getattribute__(type_)
+                        if not class_:
+                            raise InvalidData(f"Invalid class type {type_}")
+                        if self.current_token.type == TT_STRING:
+                            value = str(value)
+                        elif self.current_token.type == TT_NUMBER:
+                            value = int(value)
+                        elif self.current_token.type == TT_FLOAT:
+                            value = float(value)
+                        else:
+                            raise InvalidData(f"Invalid value for basic type")
+                        value = class_(value)
+                else:
+                    if self.current_token.type == TT_STRING:
+                        value = str(value)
+                    elif self.current_token.type == TT_NUMBER:
+                        value = int(value)
+                    elif self.current_token.type == TT_FLOAT:
+                        value = float(value)
+                    else:
+                        raise InvalidData(f"Invalid value for basic type")
+                obj.__setattr__(key, value)
+                self.advance()
+        return obj
+    
+    def parse_indented(self, indentcount:int) -> FxDCObject:
+        obj = FxDCObject()
+        indent = indentcount
+        while self.current_token.type != TT_EOF or indent >= indentcount:
+            while self.current_token.type == TT_NEWLINE:
+                self.advance()
+            
+            if self.current_token.type == TT_EOF:
+                break
+            if self.current_token.type != TT_IDENTIFIER:
+                raise InvalidData(f"Expected identifier, got {self.current_token}")
+            key = self.current_token.value
+            type_ = None
+            self.advance()
+            if self.current_token.type == TT_DEVIDER:
+                self.advance()
+                if self.current_token.type != TT_KEYWORD:
+                    raise InvalidData(f"Expected keyword class, got {self.current_token}")
+                type_ = self.current_token.value
+                self.advance()
+            
+            if self.current_token.type not in  (TT_EQUAL, TT_COLON):
+                raise InvalidData(f"Expected equal sign/colon, got {self.current_token}")
+            
+            if self.current_token.type == TT_COLON:
+                self.advance()
+                if self.current_token.type != TT_NEWLINE:
+                    raise InvalidData(f"Expected new line, got {self.current_token}")
+                self.advance()
+                indent = self.get_indent_count()
+                if indent <= indentcount:
+                    raise InvalidData(f"Expected indented block, got {self.current_token}")
+                newobj = self.parse_indented(indent)
+                value = newobj.__dict__
+                if not type_:
+                    obj.__setattr__(key, value)
+                elif type_ == 'list':
+                    l = []
+                    for v in value:
+                        l.append(value[v])
+                    obj.__setattr__(key, l)
+                elif type_ == 'dict':
+                    obj.__setattr__(key, value)
+                else:
+                    class_ = Config.__getattribute__(type_)
+                    if not class_:
+                        raise InvalidData(f"Invalid class type {type_}")
+                    try:
+                        obj.__setattr__(key, class_(**value))
+                    except TypeError:
+                        raise InvalidData(f"Invalid arguments for class {type_}")
+            else:
+                self.advance()
+                
+                if self.current_token.type not in (TT_STRING, TT_NUMBER, TT_FLOAT):
+                    raise InvalidData(f"Expected value, got {self.current_token}")
+            
+                value = self.current_token.value
+                if type_:
+                    if type_ == 'str':
+                        if not self.current_token.type == TT_STRING:
+                            raise InvalidData(f"Expected string, got {self.current_token.type}")
+                        value = str(value)
+                    elif type_ == 'int':
+                        if not self.current_token.type == TT_NUMBER:
+                            raise InvalidData(f"Expected number, got {self.current_token.type}")
+                        try:
+                            value = int(value)
+                        except ValueError:
+                            raise InvalidData(f"Invalid value for int type")
+                    elif type_ == 'float':
+                        if not self.current_token.type == TT_FLOAT:
+                            raise InvalidData(f"Expected float, got {self.current_token.type}")
+                        try:
+                            value = float(value)
+                        except ValueError:
+                            raise InvalidData(f"Invalid value for float type")
+                    elif type_ == 'bool':
+                        if self.current_token.type in ("True", 1):
+                            value = True
+                        elif self.current_token.type in ("False", 0):
+                            value = False
+                        elif self.current_token.value in ("None", "Null"):
+                            value = None
+                        else:
+                            raise InvalidData(f"Invalid value for bool type")
+                    else:
+                        class_ = Config.__getattribute__(type_)
+                        if not class_:
+                            raise InvalidData(f"Invalid class type {type_}")
+                        if self.current_token.type == TT_STRING:
+                            value = str(value)
+                        elif self.current_token.type == TT_NUMBER:
+                            value = int(value)
+                        elif self.current_token.type == TT_FLOAT:
+                            value = float(value)
+                        else:
+                            raise InvalidData(f"Invalid value for basic type")
+                        value = class_(value)
+                else:
+                    if self.current_token.type == TT_STRING:
+                        value = str(value)
+                    elif self.current_token.type == TT_NUMBER:
+                        value = int(value)
+                    elif self.current_token.type == TT_FLOAT:
+                        value = float(value)
+                    else:
+                        raise InvalidData(f"Invalid value for basic type")
+                obj.__setattr__(key, value)
+                self.advance()
+                if self.current_token.type != TT_NEWLINE and self.current_token.type != TT_EOF:
+                    raise InvalidData(f"Expected new line, got {self.current_token}")
+                self.advance()
+                indent = self.get_indent_count()
+                print(indent)
+                if indent < indentcount:
+                    break
+        return obj
+            
+        
+            
+
+
+                
+    
