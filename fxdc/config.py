@@ -1,6 +1,8 @@
 class _config:
     def __init__(self) -> None:
         self.custom_classes:list[str] = []
+        self.debug__:bool = False
+    
     
     def add_class(self, classname:str, class_:object):
         setattr(self, classname, class_)

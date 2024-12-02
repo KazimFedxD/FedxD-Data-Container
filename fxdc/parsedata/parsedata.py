@@ -1,9 +1,8 @@
-from typing import Any
 from fxdc.parsedata.lexer import *
 from fxdc.parsedata import FxDCObject
 from fxdc.exceptions import InvalidData
 from fxdc.config import Config
-
+from fxdc.misc import debug
 ## NODES
 
 BASIC_TYPES = [
@@ -25,7 +24,7 @@ class Parser:
         self.pos += 1
         if self.pos < len(self.tokens):
             self.current_token = self.tokens[self.pos]
-        print(self.current_token)
+        debug(self.current_token)
         return self.current_token
     
     def get_indent_count(self):
@@ -52,23 +51,26 @@ class Parser:
             key = self.current_token.value
             type_ = None
             self.advance()
+            self.get_indent_count()
             if self.current_token.type == TT_DEVIDER:
                 self.advance()
+                self.get_indent_count()
                 if self.current_token.type != TT_KEYWORD:
                     raise InvalidData(f"Expected keyword class, got {self.current_token}")
                 type_ = self.current_token.value
                 self.advance()
-            
+            self.get_indent_count()
             if self.current_token.type not in  (TT_EQUAL, TT_COLON):
                 raise InvalidData(f"Expected equal sign/colon, got {self.current_token}")
             
             if self.current_token.type == TT_COLON:
                 self.advance()
+                self.get_indent_count()
                 if self.current_token.type != TT_NEWLINE:
                     raise InvalidData(f"Expected new line, got {self.current_token}")
                 self.advance()
                 indentcount = self.get_indent_count()
-                print(indentcount)
+                debug(indentcount)
                 if indentcount == 0:
                     raise InvalidData(f"Expected indented block, got {self.current_token}")
                 newobj = self.parse_indented(indentcount)
@@ -97,7 +99,7 @@ class Parser:
                         raise InvalidData(f"Invalid arguments for class {type_}")
             else:
                 self.advance()
-                
+                self.get_indent_count()
                 if self.current_token.type not in (TT_STRING, TT_NUMBER, TT_FLOAT):
                     raise InvalidData(f"Expected value, got {self.current_token}")
             
@@ -154,6 +156,7 @@ class Parser:
                         raise InvalidData(f"Invalid value for basic type")
                 obj.__setattr__(key, value)
                 self.advance()
+                self.get_indent_count()
         return obj
     
     def parse_indented(self, indentcount:int) -> FxDCObject:
@@ -162,7 +165,7 @@ class Parser:
         while self.current_token.type != TT_EOF or indent >= indentcount:
             while self.current_token.type == TT_NEWLINE:
                 self.advance()
-            
+                self.get_indent_count()
             if self.current_token.type == TT_EOF:
                 break
             if self.current_token.type != TT_IDENTIFIER:
@@ -170,18 +173,21 @@ class Parser:
             key = self.current_token.value
             type_ = None
             self.advance()
+            self.get_indent_count()
             if self.current_token.type == TT_DEVIDER:
                 self.advance()
                 if self.current_token.type != TT_KEYWORD:
                     raise InvalidData(f"Expected keyword class, got {self.current_token}")
                 type_ = self.current_token.value
                 self.advance()
+                self.get_indent_count()
             
             if self.current_token.type not in  (TT_EQUAL, TT_COLON):
                 raise InvalidData(f"Expected equal sign/colon, got {self.current_token}")
             
             if self.current_token.type == TT_COLON:
                 self.advance()
+                self.get_indent_count()
                 if self.current_token.type != TT_NEWLINE:
                     raise InvalidData(f"Expected new line, got {self.current_token}")
                 self.advance()
@@ -204,12 +210,15 @@ class Parser:
                     if not class_:
                         raise InvalidData(f"Invalid class type {type_}")
                     try:
-                        obj.__setattr__(key, class_(**value))
-                    except TypeError:
-                        raise InvalidData(f"Invalid arguments for class {type_}")
+                        value = class_.from_data(**value)
+                    except AttributeError:
+                        try:
+                            obj.__setattr__(key, class_(**value))
+                        except TypeError:
+                            raise InvalidData(f"Invalid arguments for class {type_}")
             else:
                 self.advance()
-                
+                self.get_indent_count()
                 if self.current_token.type not in (TT_STRING, TT_NUMBER, TT_FLOAT):
                     raise InvalidData(f"Expected value, got {self.current_token}")
             
@@ -266,11 +275,12 @@ class Parser:
                         raise InvalidData(f"Invalid value for basic type")
                 obj.__setattr__(key, value)
                 self.advance()
+                self.get_indent_count()
                 if self.current_token.type != TT_NEWLINE and self.current_token.type != TT_EOF:
                     raise InvalidData(f"Expected new line, got {self.current_token}")
                 self.advance()
                 indent = self.get_indent_count()
-                print(indent)
+                debug(indent)
                 if indent < indentcount:
                     break
         return obj

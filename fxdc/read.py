@@ -2,7 +2,7 @@ from fxdc.exceptions import FileNotReadable, FileNotWritable, InvalidExtension
 from fxdc.parsedata.lexer import Lexer
 from fxdc.parsedata import Parser, FxDCObject
 from fxdc.config import Config
-
+from fxdc.misc import debug
 
 from io import TextIOWrapper
 
@@ -25,10 +25,10 @@ def loads(data: str) -> FxDCObject:
     
     lexer = Lexer(data, Config.custom_classes)
     tokens = lexer.make_tokens()
-    print(tokens)
+    debug(tokens)
     parser = Parser(tokens)
     obj = parser.parse()
-    print(obj.__dict__)
+    debug(obj.__dict__)
     return obj
 
     
