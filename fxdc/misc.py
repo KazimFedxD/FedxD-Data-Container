@@ -1,4 +1,4 @@
-from fxdc.config import Config
+from .config import Config
 
 def int_to_alphabetic(n:int) -> str:
     """Convert an integer to an alphabetical sequence."""

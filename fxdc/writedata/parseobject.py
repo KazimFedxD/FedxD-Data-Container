@@ -1,5 +1,5 @@
 from typing import Any, Optional
-from fxdc.misc import int_to_alphabetic, debug
+from ..misc import int_to_alphabetic, debug
 
 class ParseObject:
     def __init__(self, data:object):

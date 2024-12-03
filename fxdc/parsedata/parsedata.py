@@ -1,8 +1,8 @@
-from fxdc.parsedata.lexer import *
-from fxdc.parsedata import FxDCObject
-from fxdc.exceptions import InvalidData
-from fxdc.config import Config
-from fxdc.misc import debug
+from .lexer import *
+from .parsedata import FxDCObject
+from ..exceptions import InvalidData
+from ..config import Config
+from ..misc import debug
 ## NODES
 
 BASIC_TYPES = [

@@ -1,7 +1,7 @@
 from io import TextIOWrapper
-from fxdc.parsedata.fxdcobject import FxDCObject
-from fxdc.writedata import ParseObject
-from fxdc.exceptions import FileNotWritable, InvalidExtension
+from .parsedata.fxdcobject import FxDCObject
+from .writedata import ParseObject
+from .exceptions import FileNotWritable, InvalidExtension
 
 def dumps(data: object) -> str:
     """Dump the FXDC object to the string

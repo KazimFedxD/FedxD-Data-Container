@@ -1,8 +1,8 @@
-from fxdc.exceptions import FileNotReadable, FileNotWritable, InvalidExtension
-from fxdc.parsedata.lexer import Lexer
-from fxdc.parsedata import Parser, FxDCObject
-from fxdc.config import Config
-from fxdc.misc import debug
+from .exceptions import FileNotReadable, FileNotWritable, InvalidExtension
+from .parsedata.lexer import Lexer
+from .parsedata import Parser, FxDCObject
+from .config import Config
+from .misc import debug
 
 from io import TextIOWrapper
 
