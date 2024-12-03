@@ -1,5 +1,5 @@
 from .lexer import *
-from .parsedata import FxDCObject
+from .fxdcobject import FxDCObject
 from ..exceptions import InvalidData
 from ..config import Config
 from ..misc import debug
