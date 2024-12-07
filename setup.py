@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 with open("README.md", "r") as fh:
     long_description = fh.read()
 setup(name='fxdc',
-    version='0.5',
+    version='0.7.2',
     packages=find_packages(),
     author='FedxD',
     author_email='fedxdofficial@gmail.com',

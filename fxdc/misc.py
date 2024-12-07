@@ -1,6 +1,7 @@
 from .config import Config
 
-def int_to_alphabetic(n:int) -> str:
+
+def int_to_alphabetic(n: int) -> str:
     """Convert an integer to an alphabetical sequence."""
     result = ""
     while n > 0:
@@ -10,6 +11,7 @@ def int_to_alphabetic(n:int) -> str:
         n //= 26
     return result
 
-def debug(*values:object, sep:str=" ", end:str="\n") -> None:
+
+def debug(*values: object, sep: str = " ", end: str = "\n") -> None:
     if Config.debug__:
         print(*values, sep=sep, end=end)

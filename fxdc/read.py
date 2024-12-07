@@ -7,12 +7,11 @@ from .misc import debug
 from io import TextIOWrapper
 
 
-
 def loads(data: str) -> FxDCObject:
     """Load the FXDC object from the string
 
     Args:
-        data (str): string data of FedxD Data Container 
+        data (str): string data of FedxD Data Container
 
     Raises:
         TypeError: if the data is not a string
@@ -22,7 +21,7 @@ def loads(data: str) -> FxDCObject:
     """
     if not isinstance(data, str):
         raise TypeError("Invalid data type. Required string")
-    
+
     lexer = Lexer(data, Config.custom_classes)
     tokens = lexer.make_tokens()
     debug(tokens)
@@ -31,10 +30,8 @@ def loads(data: str) -> FxDCObject:
     debug(obj.__dict__)
     return obj
 
-    
 
-
-def load(file: TextIOWrapper|str) -> FxDCObject:
+def load(file: TextIOWrapper | str) -> FxDCObject:
     """Load the FXDC object from the file
 
     Args:
@@ -60,13 +57,9 @@ def load(file: TextIOWrapper|str) -> FxDCObject:
             raise FileNotReadable("Permission denied")
     elif not isinstance(file, TextIOWrapper):
         raise TypeError("Invalid Argument")
-    
+
     data = file.read()
     if not isinstance(data, str):
         raise TypeError("Invalid data type. Required string")
-    
+
     return loads(data)
-    
-    
-        
-     

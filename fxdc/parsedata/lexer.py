@@ -4,13 +4,20 @@ from ..exceptions import InvalidData
 
 ## TOKENS
 
+
 class Token:
-    def __init__(self, type:str, value:Optional[str]=None):
+    def __init__(
+        self, type: str, value: Optional[str] = None, line: Optional[int] = None
+    ):
         self.type = type
         self.value = value
+        self.line = line
 
     def __repr__(self):
-        return f"{self.type}" + f":{self.value}" if self.value != None else f"{self.type}"
+        return (
+            f"{self.type}" + f":{self.value}" if self.value != None else f"{self.type}"
+        )
+
 
 TT_NUMBER = "NUMBER"
 TT_FLOAT = "FLOAT"
@@ -28,7 +35,7 @@ TT_RSQBR = "RSQBR"
 
 NUMS = "0123456789"
 LETTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_"
-LETTERS_DIGITS = LETTERS + NUMS 
+LETTERS_DIGITS = LETTERS + NUMS
 
 KEYWORDS = [
     "str",
@@ -39,30 +46,29 @@ KEYWORDS = [
     "dict",
 ]
 
+
 class Lexer:
-    def __init__(
-        self,
-        text:str,
-        classes:list[str]=[]
-    ):
+    def __init__(self, text: str, classes: list[str] = []):
         self.text = text
         self.pos = -1
+        self.line = 1
         self.current_char = None
         self.KEYWORDS = KEYWORDS + classes
         self.advance()
-    
+
     def advance(self):
-        self.pos += 1 
+        self.pos += 1
         self.current_char = self.text[self.pos] if self.pos < len(self.text) else None
-        
+
     def make_tokens(self) -> list[Token]:
-        tokens:list[Token] = []
+        tokens: list[Token] = []
         while self.current_char != None:
             if self.current_char in " \t":
-                tokens.append(Token(TT_INDENT))
+                tokens.append(Token(TT_INDENT, line=self.line))
                 self.advance()
             elif self.current_char in "\n":
-                tokens.append(Token(TT_NEWLINE))
+                self.line += 1
+                tokens.append(Token(TT_NEWLINE, line=self.line))
                 self.advance()
             elif self.current_char in NUMS:
                 tokens.append(self.make_number())
@@ -71,31 +77,31 @@ class Lexer:
             elif self.current_char in "'\"":
                 tokens.append(self.make_string())
             elif self.current_char in "=":
-                tokens.append(Token(TT_EQUAL))
+                tokens.append(Token(TT_EQUAL, line=self.line))
                 self.advance()
             elif self.current_char in ":":
-                tokens.append(Token(TT_COLON))
+                tokens.append(Token(TT_COLON, line=self.line))
                 self.advance()
             elif self.current_char in "[":
-                tokens.append(Token(TT_LSQBR))
+                tokens.append(Token(TT_LSQBR, line=self.line))
                 self.advance()
             elif self.current_char in "]":
-                tokens.append(Token(TT_RSQBR))
+                tokens.append(Token(TT_RSQBR, line=self.line))
                 self.advance()
             elif self.current_char in "|":
-                tokens.append(Token(TT_DEVIDER))
+                tokens.append(Token(TT_DEVIDER, line=self.line))
                 self.advance()
             elif self.current_char in "#":
                 self.skip_comments()
-                
+
             else:
                 char = self.current_char
                 self.advance()
                 raise InvalidData(f"Invalid character {char}")
-    
-        tokens.append(Token(TT_EOF))
+
+        tokens.append(Token(TT_EOF, line=self.line))
         return tokens
-    
+
     def make_number(self) -> Token:
         num_str = ""
         dot_count = 0
@@ -109,22 +115,22 @@ class Lexer:
                 num_str += self.current_char
             self.advance()
         if dot_count == 0:
-            return Token(TT_NUMBER, num_str)
+            return Token(TT_NUMBER, num_str, line=self.line)
         else:
-            return Token(TT_FLOAT, num_str)
-    
+            return Token(TT_FLOAT, num_str, line=self.line)
+
     def make_identifier(self) -> Token:
         id_str = ""
         while self.current_char != None and self.current_char in LETTERS_DIGITS + ".":
             id_str += self.current_char
             self.advance()
         if id_str in self.KEYWORDS:
-            return Token(TT_KEYWORD, id_str)
-        return Token(TT_IDENTIFIER, id_str)
-    
+            return Token(TT_KEYWORD, id_str, line=self.line)
+        return Token(TT_IDENTIFIER, id_str, line=self.line)
+
     def make_string(self) -> Token:
         quote = self.current_char
-        escapeseq= {
+        escapeseq = {
             "n": "\n",
             "t": "\t",
             "r": "\r",
@@ -147,10 +153,9 @@ class Lexer:
                 string += self.current_char
             self.advance()
         self.advance()
-        return Token(TT_STRING, string)
+        return Token(TT_STRING, string, line=self.line)
 
     def skip_comments(self):
         while self.current_char != "\n":
             self.advance()
         self.advance()
-        

@@ -5,13 +5,12 @@ from .writedata import ParseObject
 from .write import dumps, dump
 
 __all__ = [
-    'load',
-    'loads',
-    'FxDCObject',
-    'Config',
-    'Parser',
-    'ParseObject',
-    'dumps',
-    'dump'
+    "load",
+    "loads",
+    "FxDCObject",
+    "Config",
+    "Parser",
+    "ParseObject",
+    "dumps",
+    "dump",
 ]
-
