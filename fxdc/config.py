@@ -1,3 +1,4 @@
+import sys
 class _config:
     def __init__(self) -> None:
         self.custom_classes:list[str] = []
@@ -12,6 +13,9 @@ class _config:
         delattr(self, classname)
         self.custom_classes.remove(classname)
 
+    def set_recursion_limit(self, limit:int=5000):
+        sys.setrecursionlimit(limit)
 
     
 Config = _config()
+Config.set_recursion_limit()

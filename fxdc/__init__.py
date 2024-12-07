@@ -4,7 +4,6 @@ from .config import Config
 from .writedata import ParseObject
 from .write import dumps, dump
 
-
 __all__ = [
     'load',
     'loads',

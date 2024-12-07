@@ -224,6 +224,15 @@ main|MyClass:
 ```
 #### It Also Inputs The Same Class And Can Auto Convert To That Class
 
+# Error
+## Recursion Error
+#### Incase of recursion error just do the following to increase the recursion limit
+```py
+from fxdc import Config
+
+Config.set_recursion_limit(10000) #Default is 5000 U Can Increase That
+```
+
 # Credits
 ### All Packages Made And Manages by FedxD
 
