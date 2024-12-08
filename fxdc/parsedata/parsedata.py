@@ -1,3 +1,4 @@
+from TestCase.minecraft_cmds import Player
 from .lexer import *
 from .fxdcobject import FxDCObject
 from ..exceptions import InvalidData
@@ -101,8 +102,10 @@ class Parser:
                     if not class_:
                         raise InvalidData(f"Invalid class type {type_}")
                     try:
-                        obj.from_data(**value)
+                        value = class_.from_data(**value)
+                        obj.__setattr__(key, value)
                     except AttributeError:
+                        debug(f"{type_} has no from_data")
                         try:
                             obj.__setattr__(key, class_(**value))
                         except TypeError:
@@ -181,14 +184,14 @@ class Parser:
 
     def parse_indented(self, indentcount: int) -> FxDCObject:
         obj = FxDCObject()
-        indent = indentcount
-        while self.current_token.type != TT_EOF or indent >= indentcount:
+        self.indent = indentcount
+        while self.current_token.type != TT_EOF or self.indent >= indentcount:
             while self.current_token.type == TT_NEWLINE:
                 self.advance()
                 self.get_indent_count()
             if self.current_token.type == TT_EOF:
                 break
-            if indent < indentcount:
+            if self.indent < indentcount:
                 break
             if self.current_token.type != TT_IDENTIFIER:
                 raise InvalidData(
@@ -221,12 +224,12 @@ class Parser:
                         f"Expected new line, got {self.current_token} at line {self.current_token.line}"
                     )
                 self.advance()
-                indent = self.get_indent_count()
-                if indent <= indentcount:
+                self.indent = self.get_indent_count()
+                if self.indent <= indentcount:
                     raise InvalidData(
                         f"Expected indented block, got {self.current_token} at line {self.current_token.line}"
                     )
-                newobj = self.parse_indented(indent)
+                newobj = self.parse_indented(self.indent)
                 value = newobj.__dict__
                 if not type_:
                     obj.__setattr__(key, value)
@@ -243,7 +246,9 @@ class Parser:
                         raise InvalidData(f"Invalid class type {type_}")
                     try:
                         value = class_.from_data(**value)
+                        obj.__setattr__(key, value)
                     except AttributeError:
+                        debug(f"{type_} has no from_data")
                         try:
                             obj.__setattr__(key, class_(**value))
                         except TypeError:
@@ -324,8 +329,8 @@ class Parser:
                         f"Expected new line, got {self.current_token} at line {self.current_token.line}"
                     )
                 self.advance()
-                indent = self.get_indent_count()
-                debug(indent)
-                if indent < indentcount:
+                self.indent = self.get_indent_count()
+                debug(self.indent)
+                if self.indent < indentcount:
                     break
         return obj
