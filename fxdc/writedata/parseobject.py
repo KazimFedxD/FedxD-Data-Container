@@ -1,3 +1,4 @@
+from types import NoneType
 from typing import Any, Optional
 from ..misc import int_to_alphabetic, debug
 
@@ -37,15 +38,22 @@ class ParseObject:
         for obj in data_:
             debug(obj)
             type_, data = self.convertobject(data_[obj])
-            if type(data) == dict:
+            if isinstance(data, dict):
+                if len(data) == 0:
+                    continue
                 objstr = "\t" * tab_count + f"{obj}|{type_}:\n"
                 objstr += self.parse(tab_count + 1, data)
-            elif type(data) == list:
+            elif isinstance(data, list):
+                if len(data) == 0:
+                    continue
                 objstr = "\t" * tab_count + f"{obj}|{type_}:\n"
                 objstr += self.parse_list(data, tab_count + 1)
             else:
-                if type(data) == str:
+                if isinstance(data, str):
                     data = f'"{data}"'
+                if isinstance(data,  (NoneType, bool)):
+                    data = f'"{data}"'
+                    type_ = "bool"
                 objstr = "\t" * tab_count + f"{obj}|{type_}={data}\n"
             str_ += objstr
             debug(objstr)
@@ -60,16 +68,23 @@ class ParseObject:
         str_ = ""
         for i, obj in enumerate(datalist, 1):
             type_, data = self.convertobject(obj)
-            if type(data) == dict:
+            if isinstance(data, dict):
+                if len(data) == 0:
+                    continue
                 debug("Data:", data)
                 objstr = "\t" * tab_count + f"{int_to_alphabetic(i)}|{type_}:\n"
                 objstr += self.parse(tab_count + 1, data)
-            elif type(data) == list:
+            elif isinstance(data, list):
+                if len(data) == 0:
+                    continue
                 objstr = "\t" * tab_count + f"{int_to_alphabetic(i)}|{type_}:\n"
                 objstr += self.parse_list(data, tab_count + 1)
             else:
-                if type(data) == str:
+                if isinstance(data, str):
                     data = f'"{data}"'
+                if isinstance(data, (NoneType, bool)):
+                    data = f'"{data}"'
+                    type_ = "bool"
                 objstr = "\t" * tab_count + f"{int_to_alphabetic(i)}|{type_}={data}\n"
             str_ += objstr
         return str_
