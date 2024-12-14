@@ -126,6 +126,27 @@ main|MyClass:
 	name="john"
 	age=23
 ```
+### You Can Also Put Custom Name For Class
+```py
+from fxdc import Config
+
+class MyClass:
+	def __init__(self, name, age):
+		self.name = name
+		self.age = age
+	def __repr__(self):
+		return f"<{self.name}: {self.age}>"
+
+Config.add_class("MyDopeClass", MyClass)
+```
+
+### FxDC File
+```py
+main|MyDopeClass:
+	name="john"
+	age=23
+```
+
 
 ### In Order To Make Bot Use Custom Class U Need To Add The Class To Config
 ```py
