@@ -1,14 +1,14 @@
 from types import NoneType
 from typing import Any, Optional
 from ..misc import int_to_alphabetic, debug
-
+from ..config import Config
 
 class ParseObject:
     def __init__(self, data: object):
         self.data = data
 
     def convertobject(
-        self, data: Optional[object] = None
+        self, data: object = None
     ) -> tuple[str, dict[str, Any] | Any]:
         """Convert the object to string
 
@@ -25,7 +25,8 @@ class ParseObject:
             except SyntaxError:
                 dict_ = data
         debug(dict_)
-        return data.__class__.__name__, dict_
+        type_ = Config.get_class_name(data.__class__)
+        return type_, dict_
 
     def parse(self, tab_count: int = 0, dataobject: object = None) -> str:
         """Parse the object to string

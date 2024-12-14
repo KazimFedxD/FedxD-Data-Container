@@ -3,7 +3,6 @@ from .parsedata.fxdcobject import FxDCObject
 from .writedata import ParseObject
 from .exceptions import FileNotWritable, InvalidExtension
 
-
 def dumps(data: object) -> str:
     """Dump the FXDC object to the string
 
@@ -33,6 +32,7 @@ def dump(data: object, file: str | TextIOWrapper) -> None:
     if isinstance(file, TextIOWrapper):
         try:
             file.write(dumps(data))
+            file.close()
         except Exception as e:
             raise FileNotWritable(f"Error while writing the file: {e}")
     else:
@@ -40,3 +40,4 @@ def dump(data: object, file: str | TextIOWrapper) -> None:
             raise InvalidExtension("Invalid Fxdc file")
         with open(file, "w") as f:
             f.write(dumps(data))
+
