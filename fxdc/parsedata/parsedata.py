@@ -1,4 +1,3 @@
-from TestCase.minecraft_cmds import Player
 from .lexer import *
 from .fxdcobject import FxDCObject
 from ..exceptions import InvalidData
