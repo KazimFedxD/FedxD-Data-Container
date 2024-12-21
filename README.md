@@ -139,6 +139,18 @@ class MyClass:
 
 Config.add_class("MyDopeClass", MyClass)
 ```
+### OR
+```py
+from fxdc import Config
+
+@Config.add_class("MyDopeClass")
+class MyClass:
+	def __init__(self, name, age):
+		self.name = name
+		self.age = age
+	def __repr__(self):
+		return f"<{self.name}: {self.age}>"
+```
 
 ### FxDC File
 ```py
@@ -153,6 +165,17 @@ main|MyDopeClass:
 from fxdc import Config
 
 Config.add_class("MyClass", MyClass) #Name of Class, Class
+```
+### OR
+### Add it as a decorator on top of a class
+```py
+from fxdc import Config
+
+@Config.add_class("MyClass")
+class MyClass:
+	def __init__(self, name:str):
+		self.name = name
+
 ```
 ### This Will Ensure The Initializing Of The Class When Loading the FxDC container
 #### You Can Have a to_data() function and from_data() function to get and put information to make the class object. from_data() should be of @staticmethod

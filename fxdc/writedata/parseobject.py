@@ -1,5 +1,7 @@
 from types import NoneType
 from typing import Any, Optional
+
+from fxdc.exceptions import InvalidJSONKey
 from ..misc import int_to_alphabetic, debug
 from ..config import Config
 
@@ -38,6 +40,8 @@ class ParseObject:
         _, data_ = self.convertobject(dataobject or self.data)
         for obj in data_:
             debug(obj)
+            if isinstance(obj, int):
+                raise InvalidJSONKey("JSON Key cannot be an integer")
             type_, data = self.convertobject(data_[obj])
             if isinstance(data, dict):
                 if len(data) == 0:
