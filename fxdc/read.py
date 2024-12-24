@@ -24,10 +24,10 @@ def loads(data: str) -> FxDCObject:
 
     lexer = Lexer(data, Config.custom_classes)
     tokens = lexer.make_tokens()
-    debug(tokens)
+    debug("Tokens:", tokens)
     parser = Parser(tokens)
     obj = parser.parse()
-    debug(obj.__dict__)
+    debug("Object:", obj.__dict__)
     return obj
 
 

@@ -26,7 +26,7 @@ class Parser:
         self.pos += 1
         if self.pos < len(self.tokens):
             self.current_token = self.tokens[self.pos]
-        debug(self.current_token)
+        debug("Current Token:", self.current_token, " At Position:", self.pos)
         return self.current_token
 
     def get_indent_count(self):
@@ -80,7 +80,7 @@ class Parser:
                     )
                 self.advance()
                 indentcount = self.get_indent_count()
-                debug(indentcount)
+                debug(f"Indent Count Of {key}:", indentcount)
                 if indentcount == 0:
                     raise InvalidData(
                         f"Expected indented block, got {self.current_token} at line {self.current_token.line}"
@@ -329,7 +329,8 @@ class Parser:
                     )
                 self.advance()
                 self.indent = self.get_indent_count()
-                debug(self.indent)
+                debug(f"Indent Count Of {key}:", self.indent, "Expected:", indentcount)
                 if self.indent < indentcount:
                     break
         return obj
+    

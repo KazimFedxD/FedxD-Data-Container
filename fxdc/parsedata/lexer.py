@@ -30,12 +30,11 @@ TT_INDENT = "INDENT"
 TT_DEVIDER = "DEVIDER"
 TT_EQUAL = "EQUAL"
 TT_COLON = "COLON"
-TT_LSQBR = "LSQBR"
-TT_RSQBR = "RSQBR"
 
 NUMS = "0123456789"
 LETTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_"
 LETTERS_DIGITS = LETTERS + NUMS
+
 
 KEYWORDS = [
     "str",
@@ -70,7 +69,7 @@ class Lexer:
                 self.line += 1
                 tokens.append(Token(TT_NEWLINE, line=self.line))
                 self.advance()
-            elif self.current_char in NUMS:
+            elif self.current_char in NUMS+"-":
                 tokens.append(self.make_number())
             elif self.current_char in LETTERS:
                 tokens.append(self.make_identifier())
@@ -82,12 +81,6 @@ class Lexer:
             elif self.current_char in ":":
                 tokens.append(Token(TT_COLON, line=self.line))
                 self.advance()
-            elif self.current_char in "[":
-                tokens.append(Token(TT_LSQBR, line=self.line))
-                self.advance()
-            elif self.current_char in "]":
-                tokens.append(Token(TT_RSQBR, line=self.line))
-                self.advance()
             elif self.current_char in "|":
                 tokens.append(Token(TT_DEVIDER, line=self.line))
                 self.advance()
@@ -97,7 +90,7 @@ class Lexer:
             else:
                 char = self.current_char
                 self.advance()
-                raise InvalidData(f"Invalid character {char}")
+                raise InvalidData(f"Invalid character {char} at line {self.line}")
 
         tokens.append(Token(TT_EOF, line=self.line))
         return tokens
@@ -105,12 +98,16 @@ class Lexer:
     def make_number(self) -> Token:
         num_str = ""
         dot_count = 0
-        while self.current_char != None and self.current_char in NUMS + ".":
+        while self.current_char != None and self.current_char in NUMS + ".-":
             if self.current_char == ".":
                 if dot_count == 1:
                     break
                 dot_count += 1
                 num_str += "."
+            elif self.current_char == "-":
+                if len(num_str) > 0:
+                    raise InvalidData(f"Invalid character '-' at line {self.line}")
+                num_str += "-"
             else:
                 num_str += self.current_char
             self.advance()

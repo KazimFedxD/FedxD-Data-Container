@@ -26,7 +26,7 @@ class ParseObject:
                 dict_ = data
             except SyntaxError:
                 dict_ = data
-        debug(dict_)
+        debug("Converted Object:", dict_)
         type_ = Config.get_class_name(data.__class__)
         return type_, dict_
 
@@ -39,7 +39,7 @@ class ParseObject:
         str_ = ""
         _, data_ = self.convertobject(dataobject or self.data)
         for obj in data_:
-            debug(obj)
+            debug("Object:", obj)
             if isinstance(obj, int):
                 raise InvalidJSONKey("JSON Key cannot be an integer")
             type_, data = self.convertobject(data_[obj])
@@ -61,7 +61,7 @@ class ParseObject:
                     type_ = "bool"
                 objstr = "\t" * tab_count + f"{obj}|{type_}={data}\n"
             str_ += objstr
-            debug(objstr)
+            debug("Object String:", objstr)
         return str_
 
     def parse_list(self, datalist: list[Any], tab_count: int = 1) -> str:
