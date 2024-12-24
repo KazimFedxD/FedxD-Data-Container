@@ -32,7 +32,6 @@ def dump(data: object, file: str | TextIOWrapper) -> None:
     if isinstance(file, TextIOWrapper):
         try:
             file.write(dumps(data))
-            file.close()
         except Exception as e:
             raise FileNotWritable(f"Error while writing the file: {e}")
     else:
