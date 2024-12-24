@@ -12,8 +12,8 @@ address|dict:
 	street|str = "123 Main St"
 	city|str = "New York"
 phone|list:
-	a|str = "555-1234"
-	b|str = "555-4567"
+	str = "555-1234"
+	str = "555-4567"
 ```
 
 #### It Can be Converted To a FxDC class Object or a Json Supported Dictionary
@@ -71,32 +71,78 @@ mydict:
 ### Multi Line Variables Without Type Hinting Is a Python Dict. Indentation Is Required to Diffrentiate B/w variables
 
 ## List Syntax
-### List Syntax is a Bit More Complicated. The Variable Name is ignored when using list and only the value and type is noted
+### List Syntax When Defined Its Type Doesn't Need a Key. You Can DIrectly Access All UnTypeHinted Variables By `=` and `:`
 ```py
 mylist|list:
-	a=100
-	b="john"
-	c=1203.323
-	d|bool="False"
+	="John"
+	=12
+	=1000.00
+	:
+		name="John"
+		age=12
 ```
-### Python Output
+### OUTPUT
+```json
+[
+	"John",
+	12,
+	1000.00,
+	{
+		"name": "John",
+		"age": 12
+	}
+]
+```
+
+## List Syntax (Type Hinted)
+### For TypeHinting In List Syntax You Don't Need To Use `|` You Can Directly Mention The Type And Follow Up With `:` and `=`
 ```py
-[100, "john", 1203.323, False]
+mylist|list:
+	str="John"
+	int=12
+	float=1000.00
+	dict:
+		name="John"
+		age=12
+	list:
+		str="Micheal"
+		int=23
+		bool=1
 ```
+### OUTPUT
+```json
+[
+	"John",
+	12,
+	1000.00,
+	{
+		"name": "John",
+		"age": 12
+	},
+	[
+		"Micheal",
+		23,
+		1
+	]
+]
+```
+
+
+
 
 ## Nested Variables
 
 ```py
 members|list:
-	a|dict:
+	dict:
 		name="John"
 		age=10
-	b:
+	:
 		name="Micheal"
 		age = 120
 ```
-### Python Output
-```py
+### OUTPUT
+```json
 [
 	{
 		"name": "John",
@@ -229,8 +275,8 @@ address|dict:
 	street|str = "123 Main St"
 	city|str = "New York"
 phone|list:
-	a|str = "555-1234"
-	b|str = "555-4567"
+	str = "555-1234"
+	str = "555-4567"
 """
 
 from fxdc import loads
@@ -274,7 +320,7 @@ main|MyClass:
 ```py
 from fxdc import Config
 
-Config.set_recursion_limit(10000) #Default is 5000 U Can Increase That
+Config.set_recursion_limit(10000) #Default is 1000 U Can Increase That
 ```
 
 # Credits

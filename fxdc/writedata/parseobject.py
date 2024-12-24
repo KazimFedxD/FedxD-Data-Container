@@ -77,12 +77,12 @@ class ParseObject:
                 if len(data) == 0:
                     continue
                 debug("Data:", data)
-                objstr = "\t" * tab_count + f"{int_to_alphabetic(i)}|{type_}:\n"
+                objstr = "\t" * tab_count + f"{type_}:\n"
                 objstr += self.parse(tab_count + 1, data)
             elif isinstance(data, list):
                 if len(data) == 0:
                     continue
-                objstr = "\t" * tab_count + f"{int_to_alphabetic(i)}|{type_}:\n"
+                objstr = "\t" * tab_count + f"{type_}:\n"
                 objstr += self.parse_list(data, tab_count + 1)
             else:
                 if isinstance(data, str):
@@ -90,6 +90,6 @@ class ParseObject:
                 if isinstance(data, (NoneType, bool)):
                     data = f'"{data}"'
                     type_ = "bool"
-                objstr = "\t" * tab_count + f"{int_to_alphabetic(i)}|{type_}={data}\n"
+                objstr = "\t" * tab_count + f"{type_}={data}\n"
             str_ += objstr
         return str_
