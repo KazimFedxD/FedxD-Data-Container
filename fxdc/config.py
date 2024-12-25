@@ -1,50 +1,88 @@
 import sys
-from typing import Optional
+from typing import Any, Callable, Optional
 
+class _customclass:
+    def __init__(self,
+                classname: str,
+                class_: type,
+                from_data: Optional[Callable[..., object]]=None,
+                to_data: Optional[Callable[..., dict[str, Any]]]=None,
+                ) -> None:
+        self.classname = classname
+        self.class_ = class_
+        self.from_data = from_data
+        if not from_data:
+            if hasattr(class_, "from_data"):
+                self.from_data = class_.from_data
+        self.to_data = to_data
+        if not to_data:
+            if hasattr(class_, "to_data"):
+                self.to_data = class_.to_data
+        
 
+    def __call__(self, **kwargs:Any) -> object:
+        if self.from_data:
+            return self.from_data(**kwargs)
+        print("No from_data")
+        return self.class_(**kwargs)
+    
+    def __repr__(self) -> str:
+        return self.classname
+    
+    def return_data(self, obj: object) -> dict[str, Any] :
+        if self.to_data:
+            return self.to_data(obj)
+        return obj.__dict__
+    
+    def __str__(self) -> str:
+        return "Custom Class: " + self.classname
+    
+    def __eq__(self, o: object) -> bool:
+        if isinstance(o, _customclass):
+            return self.classname == o.classname
+        elif isinstance(o, str):
+            return self.classname == o
+        return False
+
+        
+        
 class _config:
     def __init__(self) -> None:
-        self.custom_classes: list[str] = []
+        self.custom_classes: list[_customclass] = []
+        self.custom_classes_names: list[str] = []
         self.debug__: bool = False
 
-    def add_class(self, classname: Optional[str]=None, class_: Optional[type]=None):
-        """
-        Use:
-            Add the class to the Config Object
-            Can be used as a decorator or as a function
-        Args:
-            classname (Optional[str], optional): Class Name. Defaults to None.
-            class_ (Optional[type], optional): Class Type. Defaults to None.
-        Returns:
-            Returns the class after adding to the Config Object
-        """
+    def add_class(self, classname:Optional[str]=None,
+                  *,  from_data: Optional[Callable[..., object]]=None,
+                  to_data: Optional[Callable[..., dict[str, Any]]]=None,
+                  class_: Optional[type]=None):
         def wrapper(class_: type):
-            if classname:
-                setattr(self, classname, class_)
-                self.custom_classes.append(classname)
-            else:
-                setattr(self, class_.__name__, class_)
-                self.custom_classes.append(class_.__name__)
+            if self.get_class_name(class_) in self.custom_classes_names:
+                raise ValueError(f"Class {classname} already exists")
+            
+            c:_customclass = _customclass(classname or class_.__name__, class_, from_data, to_data)
+            self.custom_classes_names.append(c.classname)
+            setattr(self, c.classname, c)
             return class_
-        if not class_:
-            return wrapper
-        else:
+
+        if class_:
             return wrapper(class_)
-        
+        return wrapper
         
     def remove_class(self, classname: str):
         delattr(self, classname)
-        self.custom_classes.remove(classname)
+        self.custom_classes.pop(self.custom_classes_names.index(classname))
 
     def set_recursion_limit(self, limit: int = 1000):
         sys.setrecursionlimit(limit)
 
     def get_class_name(self, class_: type) -> str:
-        for class_name in self.custom_classes:
-            if getattr(self, class_name) == class_:
-                return class_name
+        for customclass in self.custom_classes:
+            if getattr(self, customclass.classname) == class_:
+                return customclass.classname
         return class_.__name__
 
 
-
 Config = _config()
+
+

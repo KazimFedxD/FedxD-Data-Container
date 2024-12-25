@@ -2,7 +2,7 @@ from types import NoneType
 from typing import Any, Optional
 
 from fxdc.exceptions import InvalidJSONKey
-from ..misc import int_to_alphabetic, debug
+from ..misc import debug
 from ..config import Config
 
 class ParseObject:
@@ -17,17 +17,21 @@ class ParseObject:
         Returns:
             str: Returns the string from the object
         """
-        try:
-            dict_ = data.to_data()
-        except AttributeError:
-            try:
-                dict_ = data.__dict__
-            except AttributeError:
-                dict_ = data
-            except SyntaxError:
-                dict_ = data
-        debug("Converted Object:", dict_)
         type_ = Config.get_class_name(data.__class__)
+        try:
+            getattr(Config, type_).return_data(data)
+        except:
+            try:
+                dict_ = data.to_data()
+            except AttributeError:
+                try:
+                    dict_ = data.__dict__
+                except AttributeError:
+                    dict_ = data
+                except SyntaxError:
+                    dict_ = data
+
+        debug("Converted Object:", dict_)
         return type_, dict_
 
     def parse(self, tab_count: int = 0, dataobject: object = None) -> str:

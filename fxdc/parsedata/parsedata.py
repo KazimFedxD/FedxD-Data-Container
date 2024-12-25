@@ -86,32 +86,25 @@ class Parser:
                     raise InvalidData(
                         f"Expected indented block, got {self.current_token} at line {self.current_token.line}"
                     )
-                newobj = self.parse_indented(indentcount)
-                value = newobj.__dict__
-                if not type_:
-                    obj.__setattr__(key, value)
-                elif type_ == "list":
-                    l = []
-                    for v in value:
-                        l.append(value[v])
-                    obj.__setattr__(key, l)
-                elif type_ == "dict":
-                    obj.__setattr__(key, value)
+                if type_ == "list":
+                    newobj = self.parse_list(indentcount)
+                    obj.__setattr__(key, newobj)
                 else:
-                    class_ = Config.__getattribute__(type_)
-                    if not class_:
-                        raise InvalidData(f"Invalid class type {type_}")
-                    try:
-                        value = class_.from_data(**value)
+                
+                    newobj = self.parse_indented(indentcount)
+                    value = newobj.__dict__
+                    if not type_:
                         obj.__setattr__(key, value)
-                    except AttributeError:
-                        debug(f"{type_} has no from_data")
+                    elif type_ == "dict":
+                        obj.__setattr__(key, value)
+                    else:
+                        class_ = Config.__getattribute__(type_)
+                        if not class_:
+                            raise InvalidData(f"Invalid class type {type_}")
                         try:
                             obj.__setattr__(key, class_(**value))
                         except TypeError:
                             raise InvalidData(f"Invalid arguments for class {type_}")
-                    except TypeError:
-                        raise InvalidData(f"Invalid arguments for class {type_}")
             else:
                 self.advance()
                 self.get_indent_count()
@@ -246,14 +239,9 @@ class Parser:
                         if not class_:
                             raise InvalidData(f"Invalid class type {type_}")
                         try:
-                            value = class_.from_data(**value)
-                            obj.__setattr__(key, value)
-                        except AttributeError:
-                            debug(f"{type_} has no from_data")
-                            try:
-                                obj.__setattr__(key, class_(**value))
-                            except TypeError:
-                                raise InvalidData(f"Invalid arguments for class {type_}")
+                            obj.__setattr__(key, class_(**value))
+                        except TypeError:
+                            raise InvalidData(f"Invalid arguments for class {type_}")
             else:
                 self.advance()
                 self.get_indent_count()
@@ -338,6 +326,7 @@ class Parser:
     
     def parse_list(self, indentcount:int) -> list[Any]:
         l:list[Any] = []
+        self.indent = indentcount
         while self.current_token.type != TT_EOF or self.indent >= indentcount:
             type_ = None
             while self.current_token.type == TT_NEWLINE:
@@ -385,14 +374,9 @@ class Parser:
                         if not class_:
                             raise InvalidData(f"Invalid class type {type_}")
                         try:
-                            value = class_.from_data(**value)
-                            l.append(value)
-                        except AttributeError:
-                            debug(f"{type_} has no from_data")
-                            try:
-                                l.append(class_(**value))
-                            except TypeError:
-                                raise InvalidData(f"Invalid arguments for class {type_}")
+                            l.append(class_(**value))
+                        except TypeError:
+                            raise InvalidData(f"Invalid arguments for class {type_}")
             else:
                 self.advance()
                 self.get_indent_count()

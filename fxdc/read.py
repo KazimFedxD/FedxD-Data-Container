@@ -22,7 +22,7 @@ def loads(data: str) -> FxDCObject:
     if not isinstance(data, str):
         raise TypeError("Invalid data type. Required string")
 
-    lexer = Lexer(data, Config.custom_classes)
+    lexer = Lexer(data, Config.custom_classes_names)
     tokens = lexer.make_tokens()
     debug("Tokens:", tokens)
     parser = Parser(tokens)
