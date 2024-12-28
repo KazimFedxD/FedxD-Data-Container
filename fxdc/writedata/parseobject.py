@@ -19,8 +19,9 @@ class ParseObject:
         """
         type_ = Config.get_class_name(data.__class__)
         try:
-            getattr(Config, type_).return_data(data)
+            dict_ = getattr(Config, type_).return_data(data)
         except:
+
             try:
                 dict_ = data.to_data()
             except AttributeError:
@@ -31,7 +32,7 @@ class ParseObject:
                 except SyntaxError:
                     dict_ = data
 
-        debug("Converted Object:", dict_)
+        debug("Converted Object:", dict_, 'Type:', type_)
         return type_, dict_
 
     def parse(self, tab_count: int = 0, dataobject: object = None) -> str:

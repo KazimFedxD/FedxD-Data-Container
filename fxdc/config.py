@@ -20,11 +20,10 @@ class _customclass:
                 self.to_data = class_.to_data
         
 
-    def __call__(self, **kwargs:Any) -> object:
+    def __call__(self, *args:Any,**kwargs:Any) -> object:
         if self.from_data:
-            return self.from_data(**kwargs)
-        print("No from_data")
-        return self.class_(**kwargs)
+            return self.from_data(*args, **kwargs)
+        return self.class_(*args, **kwargs)
     
     def __repr__(self) -> str:
         return self.classname
@@ -62,6 +61,7 @@ class _config:
             
             c:_customclass = _customclass(classname or class_.__name__, class_, from_data, to_data)
             self.custom_classes_names.append(c.classname)
+            self.custom_classes.append(c)
             setattr(self, c.classname, c)
             return class_
 
@@ -78,7 +78,7 @@ class _config:
 
     def get_class_name(self, class_: type) -> str:
         for customclass in self.custom_classes:
-            if getattr(self, customclass.classname) == class_:
+            if customclass.class_ == class_:
                 return customclass.classname
         return class_.__name__
 

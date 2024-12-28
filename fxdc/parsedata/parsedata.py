@@ -86,25 +86,35 @@ class Parser:
                     raise InvalidData(
                         f"Expected indented block, got {self.current_token} at line {self.current_token.line}"
                     )
-                if type_ == "list":
-                    newobj = self.parse_list(indentcount)
-                    obj.__setattr__(key, newobj)
-                else:
-                
+                while self.current_token.type == TT_NEWLINE:
+                    self.advance()
+                    self.get_indent_count()
+                if self.current_token.type == TT_IDENTIFIER:
                     newobj = self.parse_indented(indentcount)
-                    value = newobj.__dict__
-                    if not type_:
-                        obj.__setattr__(key, value)
-                    elif type_ == "dict":
-                        obj.__setattr__(key, value)
+                    if not type_ or type_ == "dict":
+                        setattr(obj, key, newobj.__dict__)
                     else:
-                        class_ = Config.__getattribute__(type_)
+                        class_ = getattr(Config, type_, None)
                         if not class_:
                             raise InvalidData(f"Invalid class type {type_}")
                         try:
-                            obj.__setattr__(key, class_(**value))
+                            setattr(obj, key, class_(**newobj.__dict__))
                         except TypeError:
                             raise InvalidData(f"Invalid arguments for class {type_}")
+                else:
+                    newobj = self.parse_list(indentcount)
+                    if not type_ or type_ == "list":
+                        setattr(obj, key, newobj)
+                    else:
+                        class_ = getattr(Config, type_, None)
+                        if not class_:
+                            raise InvalidData(f"Invalid class type {type_}")
+                        try:
+                            setattr(obj, key, class_(newobj))
+                        except TypeError:
+                            raise InvalidData(f"Invalid arguments for class {type_}")
+                
+                            
             else:
                 self.advance()
                 self.get_indent_count()
@@ -149,7 +159,7 @@ class Parser:
                         else:
                             raise InvalidData(f"Invalid value for bool type")
                     else:
-                        class_ = Config.__getattribute__(type_)
+                        class_ = getattr(Config, type_, None)
                         if not class_:
                             raise InvalidData(f"Invalid class type {type_}")
                         if self.current_token.type == TT_STRING:
@@ -170,7 +180,7 @@ class Parser:
                         value = float(value)
                     else:
                         raise InvalidData(f"Invalid value for basic type")
-                obj.__setattr__(key, value)
+                setattr(obj, key, value)
                 self.advance()
                 self.get_indent_count()
         return obj
@@ -222,24 +232,31 @@ class Parser:
                     raise InvalidData(
                         f"Expected indented block, got {self.current_token} at line {self.current_token.line}"
                     )
-                
-                if type_ == "list":
-                    newobj = self.parse_list(self.indent)
-                    obj.__setattr__(key, newobj)
-                else:
-                
+                while self.current_token.type == TT_NEWLINE:
+                    self.advance()
+                    self.get_indent_count()
+                if self.current_token.type == TT_IDENTIFIER:
                     newobj = self.parse_indented(self.indent)
-                    value = newobj.__dict__
-                    if not type_:
-                        obj.__setattr__(key, value)
-                    elif type_ == "dict":
-                        obj.__setattr__(key, value)
+                    if not type_ or type_ == "dict":
+                        setattr(obj, key, newobj.__dict__)
                     else:
-                        class_ = Config.__getattribute__(type_)
+                        class_ = getattr(Config, type_, None)
                         if not class_:
                             raise InvalidData(f"Invalid class type {type_}")
                         try:
-                            obj.__setattr__(key, class_(**value))
+                            setattr(obj, key, class_(**newobj.__dict__))
+                        except TypeError:
+                            raise InvalidData(f"Invalid arguments for class {type_}")
+                else:
+                    newobj = self.parse_list(self.indent)
+                    if not type_ or type_ == "list":
+                        setattr(obj, key, newobj.__dict__)
+                    else:
+                        class_ = getattr(Config, type_, None)
+                        if not class_:
+                            raise InvalidData(f"Invalid class type {type_}")
+                        try:
+                            setattr(obj, key, newobj.__dict__)
                         except TypeError:
                             raise InvalidData(f"Invalid arguments for class {type_}")
             else:
@@ -286,7 +303,7 @@ class Parser:
                         else:
                             raise InvalidData(f"Invalid value for bool type")
                     else:
-                        class_ = Config.__getattribute__(type_)
+                        class_ = getattr(Config, type_, None)
                         if not class_:
                             raise InvalidData(f"Invalid class type {type_}")
                         if self.current_token.type == TT_STRING:
@@ -307,7 +324,7 @@ class Parser:
                         value = float(value)
                     else:
                         raise InvalidData(f"Invalid value for basic type")
-                obj.__setattr__(key, value)
+                setattr(obj, key, value)
                 self.advance()
                 self.get_indent_count()
                 if (
@@ -358,23 +375,31 @@ class Parser:
                         f"Expected indented block, got {self.current_token} at line {self.current_token.line}"
                     )
                 
-                if type_ == "list":
-                    newobj = self.parse_list(self.indent)
-                    l.append(newobj)
-                else:
-                
+                while self.current_token.type == TT_NEWLINE:
+                    self.advance()
+                    self.get_indent_count()
+                if self.current_token.type == TT_IDENTIFIER:
                     newobj = self.parse_indented(self.indent)
-                    value = newobj.__dict__
-                    if not type_:
-                        l.append(value)
-                    elif type_ == "dict":
-                        l.append(value)
+                    if not type_ or type_ == "dict":
+                        l.append(newobj.__dict__)
                     else:
-                        class_ = Config.__getattribute__(type_)
+                        class_ = getattr(Config, type_, None)
                         if not class_:
                             raise InvalidData(f"Invalid class type {type_}")
                         try:
-                            l.append(class_(**value))
+                            l.append(class_(**newobj.__dict__))
+                        except TypeError:
+                            raise InvalidData(f"Invalid arguments for class {type_}")
+                else:
+                    newobj = self.parse_list(self.indent)
+                    if not type_ or type_ == "list":
+                        l.append(newobj)
+                    else:
+                        class_ = getattr(Config, type_, None)
+                        if not class_:
+                            raise InvalidData(f"Invalid class type {type_}")
+                        try:
+                            l.append(class_(newobj))
                         except TypeError:
                             raise InvalidData(f"Invalid arguments for class {type_}")
             else:
@@ -421,7 +446,7 @@ class Parser:
                         else:
                             raise InvalidData(f"Invalid value for bool type")
                     else:
-                        class_ = Config.__getattribute__(type_)
+                        class_ = getattr(Config, type_, None)
                         if not class_:
                             raise InvalidData(f"Invalid class type {type_}")
                         if self.current_token.type == TT_STRING:
