@@ -19,21 +19,25 @@ class ParseObject:
         """
         type_ = Config.get_class_name(data.__class__)
         try:
-            dict_ = getattr(Config, type_).return_data(data)
+            convertedobject = getattr(Config, type_).return_data(data)
         except:
 
             try:
-                dict_ = data.to_data()
+                convertedobject = data.to_data()
             except AttributeError:
                 try:
-                    dict_ = data.__dict__
-                except AttributeError:
-                    dict_ = data
-                except SyntaxError:
-                    dict_ = data
+                    convertedobject = data.__dict__
+                except AttributeError or TypeError:
+                    try:
+                        if isinstance(data, (list, dict, str)):
+                            raise TypeError()
+                        iterable = iter(data)
+                        convertedobject = [i for i in iterable]
+                    except TypeError:
+                        convertedobject = data
 
-        debug("Converted Object:", dict_, 'Type:', type_)
-        return type_, dict_
+        debug("Converted Object:", convertedobject, 'Type:', type_)
+        return type_, convertedobject
 
     def parse(self, tab_count: int = 0, dataobject: object = None) -> str:
         """Parse the object to string
@@ -45,7 +49,7 @@ class ParseObject:
         _, data_ = self.convertobject(dataobject or self.data)
         for obj in data_:
             debug("Object:", obj)
-            if isinstance(obj, int):
+            if obj.isnumeric():
                 raise InvalidJSONKey("JSON Key cannot be an integer")
             type_, data = self.convertobject(data_[obj])
             if isinstance(data, dict):

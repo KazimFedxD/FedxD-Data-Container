@@ -13,30 +13,19 @@ try:
 except ImportError:
     pd = None
     debug("Pandas not found, Pandas Default Classes will not work")
+from datetime import date, datetime, time, timedelta
 
 def load_default_classes():
-        
+    
+    ## Python Built-in Classes
+    def set_to_data(set_: set[Any]) -> list[Any]:
+        return list(set_)
+    def set_from_data(data: list[Any]) -> set[Any]:
+        return set(data)
+    Config.add_class("set", class_=set, to_data=set_to_data, from_data=set_from_data)
 
-    if np:
-        from numpy import ndarray, matrix
-        def nd_array_to_data(nd_array: ndarray[Any, Any]) -> str:
-            return f'"{nd_array}"'
-        def nd_array_from_data(data: str) -> ndarray[Any, Any]:
-            return np.array(data)
-            
-        Config.add_class("NDArray", class_=ndarray, to_data=nd_array_to_data, from_data=nd_array_from_data)
-        def matrix_to_data(matrix_: matrix[Any, Any]) -> list:
-            return json.loads((str(matrix_).replace(" ", ",")))
-        Config.add_class("Matrix", class_=matrix, to_data=matrix_to_data)
-        
-    if pd:
-        from pandas import DataFrame
-        def data_frame_to_data(data_frame: DataFrame) -> str:
-            return data_frame.to_json()
-        def data_frame_from_data(data: str) -> DataFrame:
-            return pd.read_json(data)
-        Config.add_class("DataFrame", class_=DataFrame, to_data=data_frame_to_data, from_data=data_frame_from_data)
-    from datetime import date, datetime, time, timedelta
+
+    
 
     def date_to_data(date_: date) -> str:
         return str(date_)
@@ -85,3 +74,23 @@ def load_default_classes():
             microseconds = int(data.split(",")[1].split(":")[2].split(".")[1]) if "." in data.split(",")[1].split(":")[2] else 0
         return timedelta(days, seconds, microseconds, milliseconds, minutes, hours, weeks)
     Config.add_class("TimeDelta", class_=timedelta, to_data=timedelta_to_data, from_data=timedelta_from_data)
+    
+    if np:
+        from numpy import ndarray, matrix
+        def nd_array_to_data(nd_array: ndarray[Any, Any]) -> str:
+            return str(nd_array)
+        def nd_array_from_data(data: str) -> ndarray[Any, Any]:
+            return np.array(data)
+            
+        Config.add_class("NDArray", class_=ndarray, to_data=nd_array_to_data, from_data=nd_array_from_data)
+        def matrix_to_data(matrix_: matrix[Any, Any]) -> list:
+            return json.loads((str(matrix_).replace(" ", ",")))
+        Config.add_class("Matrix", class_=matrix, to_data=matrix_to_data)  
+        
+    if pd:
+        from pandas import DataFrame
+        def data_frame_to_data(data_frame: DataFrame) -> str:
+            return json.loads(data_frame.to_json())
+        def data_frame_from_data(**data:Any) -> DataFrame:
+            return pd.read_json(json.dumps(data))
+        Config.add_class("DataFrame", class_=DataFrame, to_data=data_frame_to_data, from_data=data_frame_from_data)
