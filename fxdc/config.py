@@ -55,6 +55,31 @@ class _config:
                   *,  from_data: Optional[Callable[..., object]]=None,
                   to_data: Optional[Callable[..., dict[str, Any]]]=None,
                   class_: Optional[type]=None):
+        """Add a custom class to the config
+
+        Args:
+            classname (Optional[str], optional): Name For The Class. Defaults to `class_.__name__`.
+            from_data (Optional[Callable[..., object]], optional): Function to convert data to class. Defaults to class_.from_data if it exists. or class_.__init__
+            to_data (Optional[Callable[..., dict[str, Any]]], optional): Function to convert class to data. Defaults to class_.to_data if it exists. or class_.__dict__
+            class_ (Optional[type], optional): Class to add. If not provided, it will return a decorator.
+        Returns:
+            if Class_ is provided, it will add and return the class
+            if class_ is not provided, it will return a decorator to add on top of the class
+        
+        Usage:
+            ```py
+            @Config.add_class("MyClass")
+            class MyClass:
+                def __init__(self, data: dict[str, Any]):
+                    self.data = data
+            ```
+            OR
+            ```py
+            class MyClass:
+                def __init__(self, data: dict[str, Any]):
+                    self.data = data
+            Config.add_class("MyClass", class_=MyClass)
+        """
         def wrapper(class_: type):
             if self.get_class_name(class_) in self.custom_classes_names:
                 raise ValueError(f"Class {classname} already exists")
