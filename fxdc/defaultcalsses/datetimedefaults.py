@@ -39,11 +39,23 @@ def timedelta_to_data(timedelta_: timedelta) -> str:
     return str(timedelta_)
 def timedelta_from_data(data: str, *, days: int = 0, seconds: int = 0, microseconds: int = 0, milliseconds: int = 0, minutes: int = 0, hours: int = 0, weeks: int = 0) -> timedelta:
     if data:
-        days = int(data.split("days,")[0])
-        hours = int(data.split(",")[1].split(":")[0])
-        minutes = int(data.split(",")[1].split(":")[1])
-        seconds = int(data.split(",")[1].split(":")[2].split(".")[0])
-        microseconds = int(data.split(",")[1].split(":")[2].split(".")[1]) if "." in data.split(",")[1].split(":")[2] else 0
+        if "days" in data:
+            days = int(data.split("days,")[0])
+            data = data.split("days,")[1]
+        elif "day" in data:
+            days = int(data.split("day,")[0])
+            data = data.split("day,")[1]
+        else:
+            days = 0
+        hours, minutes, seconds = data.split(":")
+        hours = int(hours)
+        minutes = int(minutes)
+        if "." in seconds:
+            seconds, microseconds = seconds.split(".")
+        else:
+            microseconds = 0
+        seconds = int(seconds)
+        microseconds = int(microseconds)
     return timedelta(days, seconds, microseconds, milliseconds, minutes, hours, weeks)
 
 def load():

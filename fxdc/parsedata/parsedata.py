@@ -250,7 +250,7 @@ class Parser:
                 else:
                     newobj = self.parse_list(self.indent)
                     if not type_ or type_ == "list":
-                        setattr(obj, key, newobj.__dict__)
+                        setattr(obj, key, newobj)
                     else:
                         class_ = getattr(Config, type_, None)
                         if not class_:

@@ -52,7 +52,7 @@ class _config:
         self.debug__: bool = False
 
     def add_class(self, classname:Optional[str]=None,
-                  *,  from_data: Optional[Callable[..., object]]=None,
+                  *,  from_data: Optional[Callable[..., object]]=None, 
                   to_data: Optional[Callable[..., dict[str, Any]]]=None,
                   class_: Optional[type]=None):
         """Add a custom class to the config

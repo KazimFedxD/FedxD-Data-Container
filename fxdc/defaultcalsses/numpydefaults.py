@@ -8,15 +8,15 @@ except ImportError:
     debug("Numpy not found, Numpy Default Classes will not work")
 
 if np:
-        import json
-        from numpy import ndarray, matrix
-        def nd_array_to_data(nd_array: ndarray[Any, Any]) -> str:
-            return str(nd_array)
-        def nd_array_from_data(data: str) -> ndarray[Any, Any]:
-            return np.array(data)
-            
-        def matrix_to_data(matrix_: matrix[Any, Any]) -> list:
-            return json.loads((str(matrix_).replace(" ", ",")))
+    import json
+    from numpy import ndarray, matrix
+    def nd_array_to_data(nd_array: ndarray[Any, Any]) -> str:
+        return str(nd_array)
+    def nd_array_from_data(data: str) -> ndarray[Any, Any]:
+        return np.array(data)
+        
+    def matrix_to_data(matrix_: matrix[Any, Any]) -> list:
+        return json.loads((str(matrix_).replace(" ", ",")))
         
     def load():
         Config.add_class("NDArray", class_=ndarray, to_data=nd_array_to_data, from_data=nd_array_from_data)

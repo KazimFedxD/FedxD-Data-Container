@@ -18,3 +18,4 @@ __all__ = [
     "dump",
 ]
 
+load_default_classes()
