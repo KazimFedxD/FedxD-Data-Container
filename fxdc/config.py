@@ -12,12 +12,12 @@ class _customclass:
         self.class_ = class_
         self.from_data = from_data
         if not from_data:
-            if hasattr(class_, "from_data"):
-                self.from_data = class_.from_data
+            if hasattr(class_, "__fromdata__"):
+                self.from_data = class_.__fromdata__
         self.to_data = to_data
         if not to_data:
-            if hasattr(class_, "to_data"):
-                self.to_data = class_.to_data
+            if hasattr(class_, "__todata__"):
+                self.to_data = class_.__todata__
         
 
     def __call__(self, *args:Any,**kwargs:Any) -> object:
