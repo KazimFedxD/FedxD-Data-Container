@@ -1,5 +1,8 @@
 import sys
-from typing import Any, Callable, Optional
+from typing import Any, Optional, TypeVar
+from collections.abc import Callable
+
+T = TypeVar("T", bound=type)
 
 class _customclass:
     def __init__(self,
@@ -59,8 +62,8 @@ class _config:
 
         Args:
             classname (Optional[str], optional): Name For The Class. Defaults to `class_.__name__`.
-            from_data (Optional[Callable[..., object]], optional): Function to convert data to class. Defaults to class_.from_data if it exists. or class_.__init__
-            to_data (Optional[Callable[..., dict[str, Any]]], optional): Function to convert class to data. Defaults to class_.to_data if it exists. or class_.__dict__
+            from_data (Optional[Callable[..., object]], optional): Function to convert data to class. Defaults to class_.__fromdata__ if it exists. or class_.__init__ or class.__new__
+            to_data (Optional[Callable[..., dict[str, Any]]], optional): Function to convert class to data. Defaults to class_.__todata__ if it exists. or class_.__dict__
             class_ (Optional[type], optional): Class to add. If not provided, it will return a decorator.
         Returns:
             if Class_ is provided, it will add and return the class
@@ -70,17 +73,17 @@ class _config:
             ```py
             @Config.add_class("MyClass")
             class MyClass:
-                def __init__(self, data: dict[str, Any]):
+                def __init__(self, data):
                     self.data = data
             ```
             OR
             ```py
             class MyClass:
-                def __init__(self, data: dict[str, Any]):
+                def __init__(self, data):
                     self.data = data
             Config.add_class("MyClass", class_=MyClass)
         """
-        def wrapper(class_: type):
+        def wrapper(class_: T) -> T:
             if self.get_class_name(class_) in self.custom_classes_names:
                 raise ValueError(f"Class {classname} already exists")
             
