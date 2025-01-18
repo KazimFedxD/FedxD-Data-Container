@@ -1,15 +1,19 @@
 import sys
-from typing import Any, Optional, TypeVar
+from types import NoneType
+from typing import Any, Optional, TypeVar, TypeAlias
 from collections.abc import Callable
 
 T = TypeVar("T", bound=type)
+TB = TypeVar('TB', bound=type)
+
+AcceptableTypes: TypeAlias = int | float | str | bool | list[Any] | dict[Any, Any] | NoneType
 
 class _customclass:
     def __init__(self,
                 classname: str,
-                class_: type,
-                from_data: Optional[Callable[..., object]]=None,
-                to_data: Optional[Callable[..., dict[str, Any]]]=None,
+                class_: type[TB],
+                from_data: Optional[Callable[..., TB]]=None,
+                to_data: Optional[Callable[[], dict[str, AcceptableTypes]]]=None,
                 ) -> None:
         self.classname = classname
         self.class_ = class_
@@ -55,8 +59,9 @@ class _config:
         self.debug__: bool = False
 
     def add_class(self, classname:Optional[str]=None,
-                  *,  from_data: Optional[Callable[..., object]]=None, 
-                  to_data: Optional[Callable[..., dict[str, Any]]]=None,
+                  *,
+                  from_data: Optional[Callable[..., object]]=None, 
+                  to_data: Optional[Callable[..., dict[str, AcceptableTypes]]]=None,
                   class_: Optional[type]=None):
         """Add a custom class to the config
 

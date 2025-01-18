@@ -27,7 +27,7 @@ class FxDCObject:
         self.__setattr__(key, value)
 
     def __contains__(self, key: str):
-        return key in self.__dict__
+        return hasattr(self, key)
 
     def __iter__(self):
         return iter(self.__dict__.items())
