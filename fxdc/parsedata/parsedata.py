@@ -161,7 +161,7 @@ class Parser:
                     else:
                         class_ = getattr(Config, type_, None)
                         if not class_:
-                            raise InvalidData(f"Invalid class type {type_}")
+                            raise InvalidData(f"Invalid class type {type_} at line {self.current_token.line}")
                         if self.current_token.type == TT_STRING:
                             value = str(value)
                         elif self.current_token.type == TT_NUMBER:
@@ -185,7 +185,7 @@ class Parser:
                 self.get_indent_count()
         return obj
 
-    def parse_indented(self, indentcount: int) -> FxDCObject:
+    def parse_indented(self, indentcount: int) -> FxDCObject: 
         obj = FxDCObject()
         self.indent = indentcount
         while self.current_token.type != TT_EOF or self.indent >= indentcount:

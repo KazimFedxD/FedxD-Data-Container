@@ -1,4 +1,5 @@
 from io import TextIOWrapper
+from typing import Any
 from .parsedata.fxdcobject import FxDCObject
 from .writedata import ParseObject
 from .exceptions import FileNotWritable, InvalidExtension
@@ -12,7 +13,7 @@ def dumps(data: object) -> str:
         str: Returns the string from the object
     """
     if type(data) != dict:
-        data = {"main": data}
+        data:dict[str, Any] = {"main": data}
     parser = ParseObject(data)
     return parser.parse()
 
