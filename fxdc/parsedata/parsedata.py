@@ -294,9 +294,10 @@ class Parser:
                         except ValueError:
                             raise InvalidData(f"Invalid value for float type")
                     elif type_ == "bool":
-                        if self.current_token.type in ("True", 1):
+                        debug("Bool Value:", self.current_token.value, "Type:", self.current_token.value.__class__.__name__)
+                        if self.current_token.value in ("True", "1", 1):
                             value = True
-                        elif self.current_token.type in ("False", 0):
+                        elif self.current_token.value in ("False", "0", 0):
                             value = False
                         elif self.current_token.value in ("None", "Null"):
                             value = None
