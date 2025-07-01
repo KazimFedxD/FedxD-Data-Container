@@ -256,7 +256,7 @@ class Parser:
                         if not class_:
                             raise InvalidData(f"Invalid class type {type_}")
                         try:
-                            setattr(obj, key, newobj.__dict__)
+                            setattr(obj, key, newobj)
                         except TypeError:
                             raise InvalidData(f"Invalid arguments for class {type_}")
             else:

@@ -18,6 +18,7 @@ class ParseObject:
             str: Returns the string from the object
         """
         type_ = Config.get_class_name(data.__class__)
+        debug(type_)
         try:
             convertedobject = getattr(Config, type_).return_data(data)
         except:
