@@ -4,7 +4,7 @@ from .config import Config
 from .writedata import ParseObject
 from .write import dumps, dump
 from .defaultcalsses import load_default_classes
-from .json import fxdc_to_json
+from .json import fxdc_to_json as to_json
 
 
 __all__ = [
@@ -16,7 +16,7 @@ __all__ = [
     "ParseObject",
     "dumps",
     "dump",
-    "fxdc_to_json",
+    "to_json",
 ]
 
 load_default_classes()

@@ -26,3 +26,7 @@ class InvalidData(FXDCException):
 
 class InvalidJSONKey(FXDCException):
     code = 6
+    
+class ClassAlreadyInitialized(FXDCException):
+    code = 7
+    

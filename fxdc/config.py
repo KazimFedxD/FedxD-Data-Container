@@ -3,6 +3,8 @@ from types import NoneType
 from typing import Any, Optional, TypeVar, TypeAlias
 from collections.abc import Callable
 
+from fxdc.exceptions import ClassAlreadyInitialized
+
 T = TypeVar("T", bound=type)
 TB = TypeVar('TB', bound=type)
 
@@ -90,7 +92,7 @@ class _config:
         """
         def wrapper(class_: T) -> T:
             if self.get_class_name(class_) in self.custom_classes_names:
-                raise ValueError(f"Class {classname} already exists")
+                raise ClassAlreadyInitialized(f"Class {classname} already exists")
             
             c:_customclass = _customclass(classname or class_.__name__, class_, from_data, to_data)
             self.custom_classes_names.append(c.classname)
