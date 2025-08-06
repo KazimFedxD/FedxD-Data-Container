@@ -201,7 +201,7 @@ Config.add_class(class_=MyClass)
 ### Or Using a Decorator
 
 ```python
-@Config.add_class()
+@Config.add_class
 class MyClass:
     def __init__(self, name, age):
         self.name = name
