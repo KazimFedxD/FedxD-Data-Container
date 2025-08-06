@@ -105,7 +105,7 @@ def timedelta_from_data(
     return timedelta(days, seconds, microseconds, milliseconds, minutes, hours, weeks)
 
 
-def load():
+def load() -> None:
     Config.add_class(
         "TimeDelta",
         class_=timedelta,

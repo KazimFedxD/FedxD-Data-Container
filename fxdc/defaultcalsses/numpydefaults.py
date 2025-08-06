@@ -23,7 +23,7 @@ if np:
     def matrix_to_data(matrix_: matrix[Any, Any]) -> list:
         return json.loads((str(matrix_).replace(" ", ",")))
 
-    def load():
+    def load() -> None:
         Config.add_class(
             "NDArray",
             class_=ndarray,

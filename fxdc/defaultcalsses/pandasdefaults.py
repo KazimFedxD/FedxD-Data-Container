@@ -20,7 +20,7 @@ if pd:
     def data_frame_from_data(**data: Any) -> DataFrame:
         return pd.read_json(json.dumps(data))
 
-    def load():
+    def load() -> None:
         Config.add_class(
             "DataFrame",
             class_=DataFrame,

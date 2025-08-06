@@ -112,11 +112,11 @@ class _config:
             return wrapper(class_)
         return wrapper
 
-    def remove_class(self, classname: str):
+    def remove_class(self, classname: str) -> None:
         delattr(self, classname)
         self.custom_classes.pop(self.custom_classes_names.index(classname))
 
-    def set_recursion_limit(self, limit: int = 1000):
+    def set_recursion_limit(self, limit: int = 1000) -> None:
         sys.setrecursionlimit(limit)
 
     def get_class_name(self, class_: type) -> str:

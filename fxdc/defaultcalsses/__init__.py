@@ -11,7 +11,7 @@ except ImportError:
 from .datetimedefaults import load as datetime_load
 
 
-def load_default_classes():
+def load_default_classes() -> None:
     pythondefaults_load()
     if numpydefaults_load:
         numpydefaults_load()

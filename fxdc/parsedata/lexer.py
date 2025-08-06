@@ -25,12 +25,12 @@ class Token:
         ],
         value: Optional[str] = None,
         line: Optional[int] = None,
-    ):
+    ) -> None:
         self.type = type
         self.value = value
         self.line = line
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return (
             f"{self.type}" + f":{self.value}"
             if self.value is not None
@@ -66,7 +66,7 @@ KEYWORDS = [
 
 
 class Lexer:
-    def __init__(self, text: str, classes: list[str] = []):
+    def __init__(self, text: str, classes: list[str] = []) -> None:
         self.text = text
         self.pos = -1
         self.line = 1
@@ -74,7 +74,7 @@ class Lexer:
         self.KEYWORDS = KEYWORDS + classes
         self.advance()
 
-    def advance(self):
+    def advance(self) -> None:
         self.pos += 1
         self.current_char = self.text[self.pos] if self.pos < len(self.text) else None
 
@@ -173,7 +173,7 @@ class Lexer:
         self.advance()
         return Token(TT_STRING, string, line=self.line)
 
-    def skip_comments(self):
+    def skip_comments(self) -> None:
         while self.current_char != "\n":
             self.advance()
         self.advance()

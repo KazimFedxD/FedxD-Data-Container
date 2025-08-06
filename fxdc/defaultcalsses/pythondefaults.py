@@ -52,7 +52,7 @@ def enumerate_from_data(data: list[tuple[int, Any]]) -> enumerate:
     return enumerate(data, start=start)
 
 
-def load():
+def load() -> None:
     Config.add_class("set", class_=set)
     Config.add_class("dict_items", class_=dict_items, from_data=dict_items_from_data)
     Config.add_class("dict_keys", class_=dict_keys, from_data=dict_keys_from_data)

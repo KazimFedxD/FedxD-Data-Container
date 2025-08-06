@@ -26,10 +26,10 @@ class FxDCObject:
     def __getitem__(self, key: str):
         return getattr(self, key)
 
-    def __setitem__(self, key: str, value: Any):
+    def __setitem__(self, key: str, value: Any) -> None:
         setattr(self, key, value)
 
-    def __contains__(self, key: str):
+    def __contains__(self, key: str) -> bool:
         return hasattr(self, key)
 
     def __iter__(self):
@@ -54,7 +54,7 @@ class FxDCObject:
         return self.__dict__
 
     @original.setter
-    def original(self, value: Any):
+    def original(self, value: Any) -> None:
         """
         Set the Original Object
         """
