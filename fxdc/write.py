@@ -1,7 +1,8 @@
 from io import TextIOWrapper
 from typing import Any
-from .writedata import ParseObject
+
 from .exceptions import FileNotWritable, InvalidExtension
+from .writedata import ParseObject
 
 
 def dumps(data: object) -> str:

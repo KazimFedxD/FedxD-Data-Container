@@ -1,10 +1,10 @@
-from .exceptions import FileNotReadable, InvalidExtension
-from .parsedata.lexer import Lexer
-from .parsedata import Parser, FxDCObject
-from .config import Config
-from .misc import debug
-
 from io import TextIOWrapper
+
+from .config import Config
+from .exceptions import FileNotReadable, InvalidExtension
+from .misc import debug
+from .parsedata import FxDCObject, Parser
+from .parsedata.lexer import Lexer
 
 
 def loads(data: str) -> FxDCObject:

@@ -1,6 +1,6 @@
 from typing import Optional
-from ..exceptions import InvalidData
 
+from ..exceptions import InvalidData
 
 ## TOKENS
 

@@ -1,6 +1,7 @@
+from typing import Any
+
 from ..config import Config
 from ..misc import debug
-from typing import Any
 
 try:
     import pandas as pd
@@ -9,8 +10,9 @@ except ImportError:
     debug("Pandas not found, Pandas Default Classes will not work")
 
 if pd:
-    from pandas import DataFrame
     import json
+
+    from pandas import DataFrame
 
     def data_frame_to_data(data_frame: DataFrame) -> str:
         return json.loads(data_frame.to_json())

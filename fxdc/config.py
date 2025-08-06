@@ -1,7 +1,7 @@
 import sys
-from types import NoneType
-from typing import Any, Optional, TypeVar, TypeAlias
 from collections.abc import Callable
+from types import NoneType
+from typing import Any, Optional, TypeAlias, TypeVar
 
 from fxdc.exceptions import ClassAlreadyInitialized
 

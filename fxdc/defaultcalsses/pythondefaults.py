@@ -1,6 +1,8 @@
-from ..config import Config
 from typing import Any
+
 from _collections_abc import dict_items, dict_keys, dict_values
+
+from ..config import Config
 
 
 def dict_items_from_data(data: list[tuple[Any, Any]]) -> dict_items:

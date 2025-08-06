@@ -1,6 +1,7 @@
+from typing import Any
+
 from ..config import Config
 from ..misc import debug
-from typing import Any
 
 try:
     import numpy as np
@@ -10,7 +11,8 @@ except ImportError:
 
 if np:
     import json
-    from numpy import ndarray, matrix
+
+    from numpy import matrix, ndarray
 
     def nd_array_to_data(nd_array: ndarray[Any, Any]) -> str:
         return str(nd_array)

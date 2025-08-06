@@ -1,7 +1,8 @@
 from __future__ import annotations
-from .parsedata.parsedata import Parser
-from .parsedata.lexer import Lexer
+
 from .config import Config
+from .parsedata.lexer import Lexer
+from .parsedata.parsedata import Parser
 
 
 def fxdc_to_json(fxdc_string: str):

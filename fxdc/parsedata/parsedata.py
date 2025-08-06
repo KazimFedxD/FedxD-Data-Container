@@ -1,9 +1,10 @@
 from typing import Any
-from .lexer import *
-from .fxdcobject import FxDCObject
-from ..exceptions import InvalidData
+
 from ..config import Config
+from ..exceptions import InvalidData
 from ..misc import debug
+from .fxdcobject import FxDCObject
+from .lexer import *
 
 ## NODES
 

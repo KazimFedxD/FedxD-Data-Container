@@ -1,5 +1,6 @@
-from ..config import Config
 from datetime import date, datetime, time, timedelta
+
+from ..config import Config
 
 
 def date_to_data(date_: date) -> str:

@@ -2,8 +2,9 @@ from types import NoneType
 from typing import Any
 
 from fxdc.exceptions import InvalidJSONKey
-from ..misc import debug
+
 from ..config import Config
+from ..misc import debug
 
 
 class ParseObject:
