@@ -15,7 +15,9 @@ class Token:
 
     def __repr__(self):
         return (
-            f"{self.type}" + f":{self.value}" if self.value is not None else f"{self.type}"
+            f"{self.type}" + f":{self.value}"
+            if self.value is not None
+            else f"{self.type}"
         )
 
 
@@ -69,7 +71,7 @@ class Lexer:
                 self.line += 1
                 tokens.append(Token(TT_NEWLINE, line=self.line))
                 self.advance()
-            elif self.current_char in NUMS+"-":
+            elif self.current_char in NUMS + "-":
                 tokens.append(self.make_number())
             elif self.current_char in LETTERS:
                 tokens.append(self.make_identifier())
@@ -118,7 +120,9 @@ class Lexer:
 
     def make_identifier(self) -> Token:
         id_str = ""
-        while self.current_char is not None and self.current_char in LETTERS_DIGITS + ".":
+        while (
+            self.current_char is not None and self.current_char in LETTERS_DIGITS + "."
+        ):
             id_str += self.current_char
             self.advance()
         if id_str in self.KEYWORDS:

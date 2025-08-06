@@ -3,6 +3,7 @@ from typing import Any
 from .writedata import ParseObject
 from .exceptions import FileNotWritable, InvalidExtension
 
+
 def dumps(data: object) -> str:
     """Dump the FXDC object to the string
 
@@ -12,7 +13,7 @@ def dumps(data: object) -> str:
         str: Returns the string from the object
     """
     if type(data) != dict:
-        data:dict[str, Any] = {"main": data}
+        data: dict[str, Any] = {"main": data}
     parser = ParseObject(data)
     return parser.parse()
 
@@ -39,4 +40,3 @@ def dump(data: object, file: str | TextIOWrapper) -> None:
             raise InvalidExtension("Invalid Fxdc file")
         with open(file, "w") as f:
             f.write(dumps(data))
-

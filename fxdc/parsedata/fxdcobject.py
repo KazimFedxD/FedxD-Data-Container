@@ -10,18 +10,16 @@ class FxDCObject:
     Contains All the Data Extracted from the FxDC File
     """
 
-    
     def dict(self):
         """
         Convert the Object to a Dictionary
         """
         return self.__dict__
 
-
     def json(self):
         """
         Convert the Object to a JSON
-        
+
         !!! MIGHT RAISE ERROR IF OBJECT IS NOT JSON SERIALIZABLE !!!
         """
         return json.dumps(self.original, indent=4)
@@ -31,7 +29,7 @@ class FxDCObject:
 
     def __setitem__(self, key: str, value: Any):
         setattr(self, key, value)
-        
+
     def __contains__(self, key: str):
         return hasattr(self, key)
 
@@ -55,7 +53,7 @@ class FxDCObject:
             if "main" in self.__dict__:
                 return self.__dict__["main"]
         return self.__dict__
-    
+
     @original.setter
     def original(self, value: Any):
         """

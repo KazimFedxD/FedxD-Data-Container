@@ -5,13 +5,12 @@ from fxdc.exceptions import InvalidJSONKey
 from ..misc import debug
 from ..config import Config
 
+
 class ParseObject:
     def __init__(self, data: object):
         self.data = data
 
-    def convertobject(
-        self, data: object = None
-    ) -> tuple[str, dict[str, Any] | Any]:
+    def convertobject(self, data: object = None) -> tuple[str, dict[str, Any] | Any]:
         """Convert the object to string
 
         Returns:
@@ -22,7 +21,6 @@ class ParseObject:
         try:
             convertedobject = getattr(Config, type_).return_data(data)
         except:
-
             try:
                 convertedobject = data.to_data()
             except AttributeError:
@@ -37,7 +35,7 @@ class ParseObject:
                     except TypeError:
                         convertedobject = data
 
-        debug("Converted Object:", convertedobject, 'Type:', type_)
+        debug("Converted Object:", convertedobject, "Type:", type_)
         return type_, convertedobject
 
     def parse(self, tab_count: int = 0, dataobject: object = None) -> str:
@@ -66,7 +64,7 @@ class ParseObject:
             else:
                 if isinstance(data, str):
                     data = f'"{data}"'
-                if isinstance(data,  (NoneType, bool)):
+                if isinstance(data, (NoneType, bool)):
                     data = f'"{data}"'
                     type_ = "bool"
                 objstr = "\t" * tab_count + f"{obj}|{type_}={data}\n"

@@ -24,9 +24,10 @@ class FileNotWritable(FXDCException):
 class InvalidData(FXDCException):
     code = 5
 
+
 class InvalidJSONKey(FXDCException):
     code = 6
-    
+
+
 class ClassAlreadyInitialized(FXDCException):
     code = 7
-    

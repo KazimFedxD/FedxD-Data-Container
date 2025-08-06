@@ -6,17 +6,21 @@ from collections.abc import Callable
 from fxdc.exceptions import ClassAlreadyInitialized
 
 T = TypeVar("T", bound=type)
-TB = TypeVar('TB', bound=type)
+TB = TypeVar("TB", bound=type)
 
-AcceptableTypes: TypeAlias = int | float | str | bool | list[Any] | dict[Any, Any] | NoneType
+AcceptableTypes: TypeAlias = (
+    int | float | str | bool | list[Any] | dict[Any, Any] | NoneType
+)
+
 
 class _customclass:
-    def __init__(self,
-                classname: str,
-                class_: type[TB],
-                from_data: Optional[Callable[..., TB]]=None,
-                to_data: Optional[Callable[[], dict[str, AcceptableTypes]]]=None,
-                ) -> None:
+    def __init__(
+        self,
+        classname: str,
+        class_: type[TB],
+        from_data: Optional[Callable[..., TB]] = None,
+        to_data: Optional[Callable[[], dict[str, AcceptableTypes]]] = None,
+    ) -> None:
         self.classname = classname
         self.class_ = class_
         self.from_data = from_data
@@ -27,24 +31,23 @@ class _customclass:
         if not to_data:
             if hasattr(class_, "__todata__"):
                 self.to_data = class_.__todata__
-        
 
-    def __call__(self, *args:Any,**kwargs:Any) -> object:
+    def __call__(self, *args: Any, **kwargs: Any) -> object:
         if self.from_data:
             return self.from_data(*args, **kwargs)
         return self.class_(*args, **kwargs)
-    
+
     def __repr__(self) -> str:
         return self.classname
-    
-    def return_data(self, obj: object) -> dict[str, Any] :
+
+    def return_data(self, obj: object) -> dict[str, Any]:
         if self.to_data:
             return self.to_data(obj)
         return obj.__dict__
-    
+
     def __str__(self) -> str:
         return "Custom Class: " + self.classname
-    
+
     def __eq__(self, o: object) -> bool:
         if isinstance(o, _customclass):
             return self.classname == o.classname
@@ -52,19 +55,21 @@ class _customclass:
             return self.classname == o
         return False
 
-        
-        
+
 class _config:
     def __init__(self) -> None:
         self.custom_classes: list[_customclass] = []
         self.custom_classes_names: list[str] = []
         self.debug__: bool = False
 
-    def add_class(self, classname:Optional[str]=None,
-                  *,
-                  from_data: Optional[Callable[..., object]]=None, 
-                  to_data: Optional[Callable[..., dict[str, AcceptableTypes]]]=None,
-                  class_: Optional[type]=None):
+    def add_class(
+        self,
+        classname: Optional[str] = None,
+        *,
+        from_data: Optional[Callable[..., object]] = None,
+        to_data: Optional[Callable[..., dict[str, AcceptableTypes]]] = None,
+        class_: Optional[type] = None,
+    ):
         """Add a custom class to the config
 
         Args:
@@ -75,7 +80,7 @@ class _config:
         Returns:
             if Class_ is provided, it will add and return the class
             if class_ is not provided, it will return a decorator to add on top of the class
-        
+
         Usage:
             ```py
             @Config.add_class("MyClass")
@@ -90,11 +95,14 @@ class _config:
                     self.data = data
             Config.add_class("MyClass", class_=MyClass)
         """
+
         def wrapper(class_: T) -> T:
             if self.get_class_name(class_) in self.custom_classes_names:
                 raise ClassAlreadyInitialized(f"Class {classname} already exists")
-            
-            c:_customclass = _customclass(classname or class_.__name__, class_, from_data, to_data)
+
+            c: _customclass = _customclass(
+                classname or class_.__name__, class_, from_data, to_data
+            )
             self.custom_classes_names.append(c.classname)
             self.custom_classes.append(c)
             setattr(self, c.classname, c)
@@ -103,7 +111,7 @@ class _config:
         if class_:
             return wrapper(class_)
         return wrapper
-        
+
     def remove_class(self, classname: str):
         delattr(self, classname)
         self.custom_classes.pop(self.custom_classes_names.index(classname))
@@ -119,5 +127,3 @@ class _config:
 
 
 Config = _config()
-
-
