@@ -394,7 +394,7 @@ These classes are commonly used in data science, scripting, and backend developm
 ```python
 from fxdc import dumps, Config
 
-@Config.add_class()
+@Config.add_class
 class User:
     def __init__(self, name, age):
         self.name = name
