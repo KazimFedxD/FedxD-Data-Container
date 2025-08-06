@@ -21,7 +21,7 @@ class Parser:
     def __init__(self, tokens: list[Token]) -> None:
         self.tokens = tokens
         self.pos = -1
-        self.current_token = None
+        self.current_token:Token = None
         self.advance()
 
     def advance(self):
@@ -59,8 +59,8 @@ class Parser:
                 raise InvalidData(
                     f"Expected identifier, got {self.current_token} at line {self.current_token.line}"
                 )
-            key = self.current_token.value
-            type_ = None
+            key:str = self.current_token.value
+            type_:Optional[str] = None
             self.advance()
             self.get_indent_count()
             if self.current_token.type == TT_DEVIDER:
@@ -142,7 +142,7 @@ class Parser:
                         f"Expected value, got {self.current_token} at line {self.current_token.line}"
                     )
 
-                value = self.current_token.value
+                value: Any = self.current_token.value
                 if type_:
                     if type_ == "str":
                         if not self.current_token.type == TT_STRING:
@@ -223,7 +223,7 @@ class Parser:
                 raise InvalidData(
                     f"Expected identifier, got {self.current_token} at line {self.current_token.line}"
                 )
-            key = self.current_token.value
+            key:str = self.current_token.value
             type_ = None
             self.advance()
             self.get_indent_count()
@@ -304,7 +304,7 @@ class Parser:
                         f"Expected value, got {self.current_token} at line {self.current_token.line}"
                     )
 
-                value = self.current_token.value
+                value:Any = self.current_token.value
                 if type_:
                     if type_ == "str":
                         if not self.current_token.type == TT_STRING:
@@ -472,7 +472,7 @@ class Parser:
                         f"Expected value, got {self.current_token} at line {self.current_token.line}"
                     )
 
-                value = self.current_token.value
+                value:Any = self.current_token.value
                 if type_:
                     if type_ == "str":
                         if not self.current_token.type == TT_STRING:

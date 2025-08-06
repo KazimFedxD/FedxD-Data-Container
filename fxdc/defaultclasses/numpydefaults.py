@@ -14,10 +14,10 @@ if np:
 
     from numpy import matrix, ndarray
 
-    def nd_array_to_data(nd_array: ndarray[Any, Any]) -> str:
-        return str(nd_array)
+    def nd_array_to_data(nd_array: ndarray[Any, Any]) -> list[Any]:
+        return nd_array.tolist()
 
-    def nd_array_from_data(data: str) -> ndarray[Any, Any]:
+    def nd_array_from_data(data: list[Any]) -> ndarray[Any, Any]:
         return np.array(data)
 
     def matrix_to_data(matrix_: matrix[Any, Any]) -> list:

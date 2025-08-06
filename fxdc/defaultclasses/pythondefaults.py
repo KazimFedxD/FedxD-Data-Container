@@ -20,7 +20,7 @@ def dict_values_from_data(data: list[Any]) -> dict_values:
 
 def range_from_data(data: list[int]) -> range:
     start = data[0]
-    stop = data[-1]
+    stop = data[-1] + 1
     step = data[1] - data[0]
     return range(start, stop, step)
 
@@ -64,7 +64,7 @@ def load() -> None:
         name= "dict_values", class_=dict_values, from_data=dict_values_from_data
     )
     Config.add_class(name="range", class_=range, from_data=range_from_data)
-    Config.add_class(name="zip", class_=zip, from_data=zip_from_data)
+    Config.add_class(name="zip", class_=zip, from_data=zip_from_data, )
     Config.add_class(
         name= "map", class_=map, from_data=map_from_data, to_data=lambda x: list(x)
     )

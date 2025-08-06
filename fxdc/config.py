@@ -23,7 +23,7 @@ class _customclass:
         classname: str,
         class_: type[TB],
         from_data: Optional[Callable[..., TB]] = None,
-        to_data: Optional[Callable[[], dict[str, AcceptableTypes]]] = None,
+        to_data: Optional[Callable[[object], dict[str, AcceptableTypes]]] = None,
     ) -> None:
         self.classname = classname
         self.class_ = class_
@@ -89,7 +89,8 @@ class _config:
         from_data: Optional[Callable[..., object]] = None,
         to_data: Optional[Callable[..., dict[str, AcceptableTypes]]] = None,
     ) -> T:
-
+        ...
+        
     def add_class(
         self,
         class_: Optional[object] = None,

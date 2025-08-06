@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel", "build"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fxdc"
+version = "4.1"
+description = "This Package Parses FxDC file and returns the object"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "MIT"}
+
+authors = [
+  {name = "FedxD", email = "fedxdofficial@gmail.com"}
+]
+
+
+
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent"
+]
+
+[project.urls]
+Homepage = "https://github.com/KazimFedxD/FedxD-Data-Container"
+
+[tool.setuptools.packages.find]
+where = ["."]
+
+[tool.uv.sources]
+fxdc = { workspace = true }
+
+[dependency-groups]
+dev = [
+    "fxdc",
+    "numpy>=2.0.2",
+    "pandas>=2.3.1",
+    "pytest>=8.4.1",
+]

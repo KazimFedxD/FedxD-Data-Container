@@ -15,10 +15,17 @@ if pd:
     from pandas import DataFrame
 
     def data_frame_to_data(data_frame: DataFrame) -> dict[str, Any]:
-        return json.loads(data_frame.to_json())
+        data = data_frame.to_dict()
+        returndata:dict[str, Any] = {}
+        for key, value in data.items():
+            returndata[key] = list(value.values())
+        return returndata
 
     def data_frame_from_data(**data: Any) -> DataFrame:
-        return pd.read_json(json.dumps(data))
+        inputdata: dict[str, Any] = {}
+        for key, value in data.items():
+            inputdata[key] = {k: v for k, v in enumerate(value)}
+        return DataFrame.from_dict(inputdata)
 
     def load() -> None:
         Config.add_class(
