@@ -1,5 +1,5 @@
 from .config import Config
-from .defaultcalsses import load_default_classes
+from .defaultclasses import load_default_classes
 from .json import fxdc_to_json as to_json
 from .parsedata import *
 from .read import load, loads

@@ -13,8 +13,8 @@ from .datetimedefaults import load as datetime_load
 
 def load_default_classes() -> None:
     pythondefaults_load()
+    datetime_load()
     if numpydefaults_load:
         numpydefaults_load()
     if pandasdefaults_load:
         pandasdefaults_load()
-    datetime_load()
