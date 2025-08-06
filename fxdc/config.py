@@ -1,7 +1,7 @@
 import sys
 from collections.abc import Callable
 from types import NoneType
-from typing import Any, Optional, TypeAlias, TypeVar, Protocol
+from typing import Any, Optional, TypeAlias, TypeVar, Protocol, overload
 
 from fxdc.exceptions import ClassAlreadyInitialized
 
@@ -66,7 +66,21 @@ class _config:
         self.custom_classes_names: list[str] = []
         self.debug__: bool = False
 
+    @overload
+    def add_class(self, class_: T, /) -> T:
+        ...
+        
+    @overload
+    def add_class(
+        self,
+        *,
+        name: Optional[str] = None,
+        from_data: Optional[Callable[..., object]] = None,
+        to_data: Optional[Callable[..., dict[str, AcceptableTypes]]] = None,
+    ) -> IdentityDeco:
+        ...
 
+    @overload
     def add_class(
         self,
         class_: Optional[T] = None,
@@ -74,7 +88,16 @@ class _config:
         name: Optional[str] = None,
         from_data: Optional[Callable[..., object]] = None,
         to_data: Optional[Callable[..., dict[str, AcceptableTypes]]] = None,
-    ) -> IdentityDeco:
+    ) -> T:
+
+    def add_class(
+        self,
+        class_: Optional[object] = None,
+        *,
+        name: Optional[str] = None,
+        from_data: Optional[Callable[..., object]] = None,
+        to_data: Optional[Callable[..., dict[str, AcceptableTypes]]] = None,
+    ) -> object:
         """Add a custom class to the config
 
         Args:
