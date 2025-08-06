@@ -1,11 +1,15 @@
 import sys
 from collections.abc import Callable
 from types import NoneType
-from typing import Any, Optional, TypeAlias, TypeVar
+from typing import Any, Optional, TypeAlias, TypeVar, Protocol
 
 from fxdc.exceptions import ClassAlreadyInitialized
 
 T = TypeVar("T", bound=type)
+class IdentityDeco(Protocol):
+    def __call__(self, arg: T, /) -> T:
+        ...
+        
 TB = TypeVar("TB", bound=type)
 
 AcceptableTypes: TypeAlias = (
@@ -62,14 +66,15 @@ class _config:
         self.custom_classes_names: list[str] = []
         self.debug__: bool = False
 
+
     def add_class(
         self,
-        classname: Optional[str] = None,
+        class_: Optional[T] = None,
         *,
+        name: Optional[str] = None,
         from_data: Optional[Callable[..., object]] = None,
         to_data: Optional[Callable[..., dict[str, AcceptableTypes]]] = None,
-        class_: Optional[type] = None,
-    ):
+    ) -> IdentityDeco:
         """Add a custom class to the config
 
         Args:
@@ -83,7 +88,7 @@ class _config:
 
         Usage:
             ```py
-            @Config.add_class("MyClass")
+            @Config.add_class
             class MyClass:
                 def __init__(self, data):
                     self.data = data
@@ -100,11 +105,11 @@ class _config:
         def wrapper(class_: T) -> T:
             if self.get_class_name(class_) in self.custom_classes_names:
                 raise ClassAlreadyInitialized(
-                    f"Class {classname} already exists"
+                    f"Class {name} already exists"
                 )
 
             c: _customclass = _customclass(
-                classname or class_.__name__, class_, from_data, to_data
+                name or class_.__name__, class_, from_data, to_data
             )
             self.custom_classes_names.append(c.classname)
             self.custom_classes.append(c)
@@ -124,7 +129,7 @@ class _config:
 
     def get_class_name(self, class_: type) -> str:
         for customclass in self.custom_classes:
-            if customclass.class_ == class_:
+            if customclass.class_ is class_:
                 return customclass.classname
         return class_.__name__
 

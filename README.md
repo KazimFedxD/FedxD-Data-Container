@@ -201,7 +201,7 @@ Config.add_class(class_=MyClass)
 ### Or Using a Decorator
 
 ```python
-@Config.add_class()
+@Config.add_class() # Note: Calling The Decorator Is Required For Retaining Class Information In Pylance
 class MyClass:
     def __init__(self, name, age):
         self.name = name

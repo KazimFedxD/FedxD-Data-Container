@@ -111,20 +111,20 @@ def timedelta_from_data(
 
 def load() -> None:
     Config.add_class(
-        "TimeDelta",
         class_=timedelta,
+        name="TimeDelta",
         to_data=timedelta_to_data,
         from_data=timedelta_from_data,
     )
     Config.add_class(
-        "Date", class_=date, to_data=date_to_data, from_data=date_from_data
+        name="Date", class_=date, to_data=date_to_data, from_data=date_from_data
     )
     Config.add_class(
-        "DateTime",
+        name="DateTime",
         class_=datetime,
         to_data=datetime_to_data,
         from_data=datetime_from_data,
     )
     Config.add_class(
-        "Time", class_=time, to_data=time_to_data, from_data=time_from_data
+        name="Time", class_=time, to_data=time_to_data, from_data=time_from_data
     )

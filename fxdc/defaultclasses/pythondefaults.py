@@ -53,25 +53,25 @@ def enumerate_from_data(data: list[tuple[int, Any]]) -> enumerate:
 
 
 def load() -> None:
-    Config.add_class("set", class_=set)
+    Config.add_class(name="set", class_=set)
     Config.add_class(
-        "dict_items", class_=dict_items, from_data=dict_items_from_data
+        name="dict_items", class_=dict_items, from_data=dict_items_from_data
     )
     Config.add_class(
-        "dict_keys", class_=dict_keys, from_data=dict_keys_from_data
+        name="dict_keys", class_=dict_keys, from_data=dict_keys_from_data
     )
     Config.add_class(
-        "dict_values", class_=dict_values, from_data=dict_values_from_data
+        name= "dict_values", class_=dict_values, from_data=dict_values_from_data
     )
-    Config.add_class("range", class_=range, from_data=range_from_data)
-    Config.add_class("zip", class_=zip, from_data=zip_from_data)
+    Config.add_class(name="range", class_=range, from_data=range_from_data)
+    Config.add_class(name="zip", class_=zip, from_data=zip_from_data)
     Config.add_class(
-        "map", class_=map, from_data=map_from_data, to_data=lambda x: list(x)
+        name= "map", class_=map, from_data=map_from_data, to_data=lambda x: list(x)
     )
-    Config.add_class("filter", class_=filter, from_data=filter_from_data)
+    Config.add_class(name="filter", class_=filter, from_data=filter_from_data)
     Config.add_class(
-        "enumerate", class_=enumerate, from_data=enumerate_from_data
+        name="enumerate", class_=enumerate, from_data=enumerate_from_data
     )
-    Config.add_class("bytearray", class_=bytearray)
-    Config.add_class("bytes", class_=bytes)
-    Config.add_class("tuple", class_=tuple)
+    Config.add_class(name="bytearray", class_=bytearray)
+    Config.add_class(name="bytes", class_=bytes)
+    Config.add_class(name="tuple", class_=tuple)

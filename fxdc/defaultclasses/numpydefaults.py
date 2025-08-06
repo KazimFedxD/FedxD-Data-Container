@@ -25,9 +25,9 @@ if np:
 
     def load() -> None:
         Config.add_class(
-            "NDArray",
+            name="NDArray",
             class_=ndarray,
             to_data=nd_array_to_data,
             from_data=nd_array_from_data,
         )
-        Config.add_class("Matrix", class_=matrix, to_data=matrix_to_data)
+        Config.add_class(name="Matrix", class_=matrix, to_data=matrix_to_data)

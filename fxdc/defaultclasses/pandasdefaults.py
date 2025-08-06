@@ -22,7 +22,7 @@ if pd:
 
     def load() -> None:
         Config.add_class(
-            "DataFrame",
+            name="DataFrame",
             class_=DataFrame,
             to_data=data_frame_to_data,
             from_data=data_frame_from_data,
