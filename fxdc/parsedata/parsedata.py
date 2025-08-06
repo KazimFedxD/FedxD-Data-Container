@@ -106,9 +106,13 @@ class Parser:
                         try:
                             setattr(
                                 obj, key, class_(**newobj.__dict__)
-                            ) if preserve_type else setattr(obj, key, newobj.__dict__)
+                            ) if preserve_type else setattr(
+                                obj, key, newobj.__dict__
+                            )
                         except TypeError:
-                            raise InvalidData(f"Invalid arguments for class {type_}")
+                            raise InvalidData(
+                                f"Invalid arguments for class {type_}"
+                            )
                 else:
                     newobj = self.parse_list(indentcount, preserve_type)
                     if not type_ or type_ == "list":
@@ -122,12 +126,18 @@ class Parser:
                                 obj, key, class_(newobj)
                             ) if preserve_type else setattr(obj, key, newobj)
                         except TypeError:
-                            raise InvalidData(f"Invalid arguments for class {type_}")
+                            raise InvalidData(
+                                f"Invalid arguments for class {type_}"
+                            )
 
             else:
                 self.advance()
                 self.get_indent_count()
-                if self.current_token.type not in (TT_STRING, TT_NUMBER, TT_FLOAT):
+                if self.current_token.type not in (
+                    TT_STRING,
+                    TT_NUMBER,
+                    TT_FLOAT,
+                ):
                     raise InvalidData(
                         f"Expected value, got {self.current_token} at line {self.current_token.line}"
                     )
@@ -259,9 +269,13 @@ class Parser:
                         try:
                             setattr(
                                 obj, key, class_(**newobj.__dict__)
-                            ) if preserve_type else setattr(obj, key, newobj.__dict__)
+                            ) if preserve_type else setattr(
+                                obj, key, newobj.__dict__
+                            )
                         except TypeError:
-                            raise InvalidData(f"Invalid arguments for class {type_}")
+                            raise InvalidData(
+                                f"Invalid arguments for class {type_}"
+                            )
                 else:
                     newobj = self.parse_list(self.indent, preserve_type)
                     if not type_ or type_ == "list":
@@ -275,11 +289,17 @@ class Parser:
                                 obj, key, class_(newobj)
                             ) if preserve_type else setattr(obj, key, newobj)
                         except TypeError:
-                            raise InvalidData(f"Invalid arguments for class {type_}")
+                            raise InvalidData(
+                                f"Invalid arguments for class {type_}"
+                            )
             else:
                 self.advance()
                 self.get_indent_count()
-                if self.current_token.type not in (TT_STRING, TT_NUMBER, TT_FLOAT):
+                if self.current_token.type not in (
+                    TT_STRING,
+                    TT_NUMBER,
+                    TT_FLOAT,
+                ):
                     raise InvalidData(
                         f"Expected value, got {self.current_token} at line {self.current_token.line}"
                     )
@@ -359,12 +379,19 @@ class Parser:
                     )
                 self.advance()
                 self.indent = self.get_indent_count()
-                debug(f"Indent Count Of {key}:", self.indent, "Expected:", indentcount)
+                debug(
+                    f"Indent Count Of {key}:",
+                    self.indent,
+                    "Expected:",
+                    indentcount,
+                )
                 if self.indent < indentcount:
                     break
         return obj
 
-    def parse_list(self, indentcount: int, preserve_type: bool = True) -> list[Any]:
+    def parse_list(
+        self, indentcount: int, preserve_type: bool = True
+    ) -> list[Any]:
         l: list[Any] = []
         self.indent = indentcount
         while self.current_token.type != TT_EOF or self.indent >= indentcount:
@@ -414,7 +441,9 @@ class Parser:
                                 class_(**newobj.__dict__)
                             ) if preserve_type else l.append(newobj.__dict__)
                         except TypeError:
-                            raise InvalidData(f"Invalid arguments for class {type_}")
+                            raise InvalidData(
+                                f"Invalid arguments for class {type_}"
+                            )
                 else:
                     newobj = self.parse_list(self.indent, preserve_type)
                     if not type_ or type_ == "list":
@@ -424,15 +453,21 @@ class Parser:
                         if not class_:
                             raise InvalidData(f"Invalid class type {type_}")
                         try:
-                            l.append(class_(newobj)) if preserve_type else l.append(
-                                newobj
-                            )
+                            l.append(
+                                class_(newobj)
+                            ) if preserve_type else l.append(newobj)
                         except TypeError:
-                            raise InvalidData(f"Invalid arguments for class {type_}")
+                            raise InvalidData(
+                                f"Invalid arguments for class {type_}"
+                            )
             else:
                 self.advance()
                 self.get_indent_count()
-                if self.current_token.type not in (TT_STRING, TT_NUMBER, TT_FLOAT):
+                if self.current_token.type not in (
+                    TT_STRING,
+                    TT_NUMBER,
+                    TT_FLOAT,
+                ):
                     raise InvalidData(
                         f"Expected value, got {self.current_token} at line {self.current_token.line}"
                     )
@@ -506,7 +541,12 @@ class Parser:
                     )
                 self.advance()
                 self.indent = self.get_indent_count()
-                debug("Indent Count Of List:", self.indent, "Expected:", indentcount)
+                debug(
+                    "Indent Count Of List:",
+                    self.indent,
+                    "Expected:",
+                    indentcount,
+                )
                 if self.indent < indentcount:
                     break
         return l

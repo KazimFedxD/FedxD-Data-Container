@@ -93,12 +93,15 @@ class _config:
             class MyClass:
                 def __init__(self, data):
                     self.data = data
-            Config.add_class("MyClass", class_=MyClass)
-        """
+
+
+            Config.add_class("MyClass", class_=MyClass)"""
 
         def wrapper(class_: T) -> T:
             if self.get_class_name(class_) in self.custom_classes_names:
-                raise ClassAlreadyInitialized(f"Class {classname} already exists")
+                raise ClassAlreadyInitialized(
+                    f"Class {classname} already exists"
+                )
 
             c: _customclass = _customclass(
                 classname or class_.__name__, class_, from_data, to_data

@@ -76,7 +76,9 @@ class Lexer:
 
     def advance(self) -> None:
         self.pos += 1
-        self.current_char = self.text[self.pos] if self.pos < len(self.text) else None
+        self.current_char = (
+            self.text[self.pos] if self.pos < len(self.text) else None
+        )
 
     def make_tokens(self) -> list[Token]:
         tokens: list[Token] = []
@@ -109,7 +111,9 @@ class Lexer:
             else:
                 char = self.current_char
                 self.advance()
-                raise InvalidData(f"Invalid character {char} at line {self.line}")
+                raise InvalidData(
+                    f"Invalid character {char} at line {self.line}"
+                )
 
         tokens.append(Token(TT_EOF, line=self.line))
         return tokens
@@ -117,7 +121,9 @@ class Lexer:
     def make_number(self) -> Token:
         num_str = ""
         dot_count = 0
-        while self.current_char is not None and self.current_char in NUMS + ".-":
+        while (
+            self.current_char is not None and self.current_char in NUMS + ".-"
+        ):
             if self.current_char == ".":
                 if dot_count == 1:
                     break
@@ -125,7 +131,9 @@ class Lexer:
                 num_str += "."
             elif self.current_char == "-":
                 if len(num_str) > 0:
-                    raise InvalidData(f"Invalid character '-' at line {self.line}")
+                    raise InvalidData(
+                        f"Invalid character '-' at line {self.line}"
+                    )
                 num_str += "-"
             else:
                 num_str += self.current_char
@@ -138,7 +146,8 @@ class Lexer:
     def make_identifier(self) -> Token:
         id_str = ""
         while (
-            self.current_char is not None and self.current_char in LETTERS_DIGITS + "."
+            self.current_char is not None
+            and self.current_char in LETTERS_DIGITS + "."
         ):
             id_str += self.current_char
             self.advance()

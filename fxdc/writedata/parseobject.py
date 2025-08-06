@@ -11,7 +11,9 @@ class ParseObject:
     def __init__(self, data: object) -> None:
         self.data = data
 
-    def convertobject(self, data: object = None) -> tuple[str, dict[str, Any] | Any]:
+    def convertobject(
+        self, data: object = None
+    ) -> tuple[str, dict[str, Any] | Any]:
         """Convert the object to string
 
         Returns:

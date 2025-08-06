@@ -2,7 +2,9 @@
 class FXDCException(Exception):
     def __init__(self, *args, **kw) -> None:
         if self.__class__ is FXDCException:
-            raise RuntimeError("FXDCException should not be instantiated directly")
+            raise RuntimeError(
+                "FXDCException should not be instantiated directly"
+            )
         super().__init__(*args, **kw)
 
     def _get_code(self):
