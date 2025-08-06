@@ -23,7 +23,7 @@ class ParseObject:
             convertedobject = getattr(Config, type_).return_data(data)
         except:
             try:
-                convertedobject = data.to_data()
+                convertedobject = data.__todata__()
             except AttributeError:
                 try:
                     convertedobject = data.__dict__

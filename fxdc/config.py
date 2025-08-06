@@ -9,7 +9,7 @@ T = TypeVar("T", bound=type)
 TB = TypeVar("TB", bound=type)
 
 AcceptableTypes: TypeAlias = (
-    int | float | str | bool | list[Any] | dict[Any, Any] | NoneType
+    int | float | str | bool | list[Any] | dict[str, Any] | NoneType
 )
 
 

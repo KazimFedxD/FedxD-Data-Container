@@ -14,7 +14,7 @@ if pd:
 
     from pandas import DataFrame
 
-    def data_frame_to_data(data_frame: DataFrame) -> str:
+    def data_frame_to_data(data_frame: DataFrame) -> dict[str, Any]:
         return json.loads(data_frame.to_json())
 
     def data_frame_from_data(**data: Any) -> DataFrame:

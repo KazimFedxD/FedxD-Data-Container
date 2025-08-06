@@ -1,4 +1,6 @@
-from typing import Optional
+from __future__ import annotations
+
+from typing import Literal, Optional
 
 from ..exceptions import InvalidData
 
@@ -7,7 +9,22 @@ from ..exceptions import InvalidData
 
 class Token:
     def __init__(
-        self, type: str, value: Optional[str] = None, line: Optional[int] = None
+        self,
+        type: Literal[
+            "NUMBER",
+            "FLOAT",
+            "STRING",
+            "IDENTIFIER",
+            "KEYWORD",
+            "EOF",
+            "NEWLINE",
+            "INDENT",
+            "DEVIDER",
+            "EQUAL",
+            "COLON",
+        ],
+        value: Optional[str] = None,
+        line: Optional[int] = None,
     ):
         self.type = type
         self.value = value
