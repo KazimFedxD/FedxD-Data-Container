@@ -1,5 +1,5 @@
 from types import NoneType
-from typing import Any, Optional
+from typing import Any
 
 from fxdc.exceptions import InvalidJSONKey
 from ..misc import debug

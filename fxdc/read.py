@@ -1,4 +1,4 @@
-from .exceptions import FileNotReadable, FileNotWritable, InvalidExtension
+from .exceptions import FileNotReadable, InvalidExtension
 from .parsedata.lexer import Lexer
 from .parsedata import Parser, FxDCObject
 from .config import Config

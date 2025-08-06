@@ -51,7 +51,7 @@ class Parser:
             if self.current_token.type == TT_INDENT:
                 self.advance()
                 if self.current_token.type not in (TT_EOF, TT_NEWLINE):
-                    raise InvalidData(f"Unexpected indent")
+                    raise InvalidData("Unexpected indent")
             if self.current_token.type == TT_EOF:
                 break
             if self.current_token.type != TT_IDENTIFIER:
@@ -144,7 +144,7 @@ class Parser:
                         try:
                             value = int(value)
                         except ValueError:
-                            raise InvalidData(f"Invalid value for int type")
+                            raise InvalidData("Invalid value for int type")
                     elif type_ == "float":
                         if not self.current_token.type == TT_FLOAT:
                             raise InvalidData(
@@ -153,7 +153,7 @@ class Parser:
                         try:
                             value = float(value)
                         except ValueError:
-                            raise InvalidData(f"Invalid value for float type")
+                            raise InvalidData("Invalid value for float type")
                     elif type_ == "bool":
                         if self.current_token.type in ("True", 1):
                             value = True
@@ -162,7 +162,7 @@ class Parser:
                         elif self.current_token.value in ("None", "Null"):
                             value = None
                         else:
-                            raise InvalidData(f"Invalid value for bool type")
+                            raise InvalidData("Invalid value for bool type")
                     else:
                         class_ = getattr(Config, type_, None)
                         if not class_:
@@ -174,7 +174,7 @@ class Parser:
                         elif self.current_token.type == TT_FLOAT:
                             value = float(value)
                         else:
-                            raise InvalidData(f"Invalid value for basic type")
+                            raise InvalidData("Invalid value for basic type")
                         value = class_(value) if preserve_type else value
                 else:
                     if self.current_token.type == TT_STRING:
@@ -184,7 +184,7 @@ class Parser:
                     elif self.current_token.type == TT_FLOAT:
                         value = float(value)
                     else:
-                        raise InvalidData(f"Invalid value for basic type")
+                        raise InvalidData("Invalid value for basic type")
                 setattr(obj, key, value)
                 self.advance()
                 self.get_indent_count()
@@ -288,7 +288,7 @@ class Parser:
                         try:
                             value = int(value)
                         except ValueError:
-                            raise InvalidData(f"Invalid value for int type")
+                            raise InvalidData("Invalid value for int type")
                     elif type_ == "float":
                         if not self.current_token.type == TT_FLOAT:
                             raise InvalidData(
@@ -297,7 +297,7 @@ class Parser:
                         try:
                             value = float(value)
                         except ValueError:
-                            raise InvalidData(f"Invalid value for float type")
+                            raise InvalidData("Invalid value for float type")
                     elif type_ == "bool":
                         debug("Bool Value:", self.current_token.value, "Type:", self.current_token.value.__class__.__name__)
                         if self.current_token.value in ("True", "1", 1):
@@ -307,7 +307,7 @@ class Parser:
                         elif self.current_token.value in ("None", "Null"):
                             value = None
                         else:
-                            raise InvalidData(f"Invalid value for bool type")
+                            raise InvalidData("Invalid value for bool type")
                     else:
                         class_ = getattr(Config, type_, None)
                         if not class_:
@@ -319,7 +319,7 @@ class Parser:
                         elif self.current_token.type == TT_FLOAT:
                             value = float(value)
                         else:
-                            raise InvalidData(f"Invalid value for basic type")
+                            raise InvalidData("Invalid value for basic type")
                         value = class_(value) if preserve_type else value
                 else:
                     if self.current_token.type == TT_STRING:
@@ -329,7 +329,7 @@ class Parser:
                     elif self.current_token.type == TT_FLOAT:
                         value = float(value)
                     else:
-                        raise InvalidData(f"Invalid value for basic type")
+                        raise InvalidData("Invalid value for basic type")
                 setattr(obj, key, value)
                 self.advance()
                 self.get_indent_count()
@@ -432,7 +432,7 @@ class Parser:
                         try:
                             value = int(value)
                         except ValueError:
-                            raise InvalidData(f"Invalid value for int type")
+                            raise InvalidData("Invalid value for int type")
                     elif type_ == "float":
                         if not self.current_token.type == TT_FLOAT:
                             raise InvalidData(
@@ -441,7 +441,7 @@ class Parser:
                         try:
                             value = float(value)
                         except ValueError:
-                            raise InvalidData(f"Invalid value for float type")
+                            raise InvalidData("Invalid value for float type")
                     elif type_ == "bool":
                         if self.current_token.value in ("True", "1"):
                             value = True
@@ -450,7 +450,7 @@ class Parser:
                         elif self.current_token.value in ("None", "Null"):
                             value = None
                         else:
-                            raise InvalidData(f"Invalid value for bool type")
+                            raise InvalidData("Invalid value for bool type")
                     else:
                         class_ = getattr(Config, type_, None)
                         if not class_:
@@ -462,7 +462,7 @@ class Parser:
                         elif self.current_token.type == TT_FLOAT:
                             value = float(value)
                         else:
-                            raise InvalidData(f"Invalid value for basic type")
+                            raise InvalidData("Invalid value for basic type")
                         value = class_(value) if preserve_type else value
                 else:
                     if self.current_token.type == TT_STRING:
@@ -472,7 +472,7 @@ class Parser:
                     elif self.current_token.type == TT_FLOAT:
                         value = float(value)
                     else:
-                        raise InvalidData(f"Invalid value for basic type")
+                        raise InvalidData("Invalid value for basic type")
                 l.append(value)
                 self.advance()
                 self.get_indent_count()
@@ -485,7 +485,7 @@ class Parser:
                     )
                 self.advance()
                 self.indent = self.get_indent_count()
-                debug(f"Indent Count Of List:", self.indent, "Expected:", indentcount)
+                debug("Indent Count Of List:", self.indent, "Expected:", indentcount)
                 if self.indent < indentcount:
                     break
         return l

@@ -1,6 +1,5 @@
 from io import TextIOWrapper
 from typing import Any
-from .parsedata.fxdcobject import FxDCObject
 from .writedata import ParseObject
 from .exceptions import FileNotWritable, InvalidExtension
 

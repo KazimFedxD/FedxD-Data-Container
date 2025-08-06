@@ -15,7 +15,7 @@ class Token:
 
     def __repr__(self):
         return (
-            f"{self.type}" + f":{self.value}" if self.value != None else f"{self.type}"
+            f"{self.type}" + f":{self.value}" if self.value is not None else f"{self.type}"
         )
 
 
@@ -61,7 +61,7 @@ class Lexer:
 
     def make_tokens(self) -> list[Token]:
         tokens: list[Token] = []
-        while self.current_char != None:
+        while self.current_char is not None:
             if self.current_char in " \t":
                 tokens.append(Token(TT_INDENT, line=self.line))
                 self.advance()
@@ -98,7 +98,7 @@ class Lexer:
     def make_number(self) -> Token:
         num_str = ""
         dot_count = 0
-        while self.current_char != None and self.current_char in NUMS + ".-":
+        while self.current_char is not None and self.current_char in NUMS + ".-":
             if self.current_char == ".":
                 if dot_count == 1:
                     break
@@ -118,7 +118,7 @@ class Lexer:
 
     def make_identifier(self) -> Token:
         id_str = ""
-        while self.current_char != None and self.current_char in LETTERS_DIGITS + ".":
+        while self.current_char is not None and self.current_char in LETTERS_DIGITS + ".":
             id_str += self.current_char
             self.advance()
         if id_str in self.KEYWORDS:
@@ -139,7 +139,7 @@ class Lexer:
         }
         self.advance()
         string = ""
-        while self.current_char != None and self.current_char != quote:
+        while self.current_char is not None and self.current_char != quote:
             if self.current_char == "\\":
                 self.advance()
                 if self.current_char in escapeseq:
