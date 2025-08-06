@@ -195,13 +195,13 @@ class MyClass:
         self.age = age
 
 from fxdc import Config
-Config.add_class("MyClass", class_=MyClass)
+Config.add_class(class_=MyClass)
 ```
 
 ### Or Using a Decorator
 
 ```python
-@Config.add_class("MyClass")
+@Config.add_class()
 class MyClass:
     def __init__(self, name, age):
         self.name = name
@@ -209,6 +209,25 @@ class MyClass:
 ```
 
 > You can register your classes with FxDC either manually using `Config.add_class()` or by applying it as a decorator.
+
+### Entering Custom Name
+FxDC Config add_class() also supports custom names for distinguishing b/w different classes with same name
+
+> ⚠️ **Warning:** Using different name that the class will result in different name in the fxdc file. During Loading the FxDC File If the Name in the Config is changed or is assigned to a different class it will lead to failure
+
+```py
+from queue import Queue
+
+# Registering Queue class with FxDC as "Queue"
+Config.add_class("Queue", class_=Queue)
+
+from multiprocessing import Queue
+
+# Registering multiprocessing Queue class with FxDC as "MultiprocessingQueue"
+Config.add_class("MultiprocessingQueue", class_=Queue)
+```
+
+This example shows that you can add classes that have the same name and load it to the config with different names.
 
 ### Advanced Serialization (Optional)
 
