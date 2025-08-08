@@ -18,10 +18,11 @@ class Field(Generic[T]):
         null: bool = True,
         blank: bool = True
     ):
-        if verbose_name[0] not in string.ascii_letters:
-            raise FieldError("Name Should Start With A Letter")
-        if any([x not in ACCEPTABLECHARACTERS for x in verbose_name]):
-            raise FieldError("Name Should Only Contain Letters, Digits and Underscore")
+        if verbose_name:
+            if verbose_name[0] not in string.ascii_letters + "_":
+                raise FieldError("Name Should Start With A Letter")
+            if any([x not in ACCEPTABLECHARACTERS for x in verbose_name]):
+                raise FieldError("Name Should Only Contain Letters, Digits and Underscore")
         self.__verbose_name = verbose_name
         self.__default = default
         self.__typechecking = typechecking
