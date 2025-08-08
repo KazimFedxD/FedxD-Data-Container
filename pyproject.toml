@@ -7,7 +7,7 @@ name = "fxdc"
 version = "4.2"
 description = "This Package Parses FxDC file and returns the object"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 license = {text = "MIT"}
 
 authors = [

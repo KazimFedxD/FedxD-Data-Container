@@ -5,7 +5,7 @@ from .parsedata import *
 from .read import load, loads
 from .write import dump, dumps
 from .writedata import ParseObject
-
+from .fields import Field as FxDCField
 __all__ = [
     "load",
     "loads",
@@ -16,6 +16,7 @@ __all__ = [
     "dumps",
     "dump",
     "to_json",
+    "FxDCField",
 ]
 
 load_default_classes()
