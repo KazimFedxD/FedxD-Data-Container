@@ -13,16 +13,19 @@ class ParseObject:
 
     def convertobject(
         self, data: object = None
-    ) -> tuple[str, dict[str, Any] | Any]:
+    ) -> tuple[str, dict[str, Any] | Any, Any]:
         """Convert the object to string
 
         Returns:
             str: Returns the string from the object
         """
         type_ = Config.get_class_name(data.__class__)
+        class_ = None
+        descriptions: dict[str, str] = {}
         debug(type_)
         try:
-            convertedobject = getattr(Config, type_).return_data(data)
+            class_ = getattr(Config, type_)
+            convertedobject, descriptions = class_.return_data(data)
         except:
             try:
                 convertedobject = data.__todata__()
@@ -39,30 +42,48 @@ class ParseObject:
                         convertedobject = data
 
         debug("Converted Object:", convertedobject, "Type:", type_)
-        return type_, convertedobject
+        return type_, convertedobject, descriptions
 
-    def parse(self, tab_count: int = 0, dataobject: object = None) -> str:
+    def parse(
+        self,
+        tab_count: int = 0,
+        dataobject: object = None,
+        descs: dict[str, str] = None,
+    ) -> str:
         """Parse the object to string
 
         Returns:
             str: Returns the string from the object
         """
         str_ = ""
-        _, data_ = self.convertobject(dataobject or self.data)
+        type_, data_, descriptions = self.convertobject(dataobject or self.data)
         for obj in data_:
-            debug("Object:", obj)
+            if descs:
+                desc = descs.get(obj, None)
+            else:
+                desc = None
+            debug("Object:", obj, "Description:", desc)
             if obj.isnumeric():
                 raise InvalidJSONKey("JSON Key cannot be an integer")
-            type_, data = self.convertobject(data_[obj])
+            type_, data, descriptions_ = self.convertobject(data_[obj])
+
             if isinstance(data, dict):
                 if len(data) == 0:
                     continue
-                objstr = "\t" * tab_count + f"{obj}|{type_}:\n"
-                objstr += self.parse(tab_count + 1, data)
+                objstr = (
+                    "\t" * tab_count + f"{obj}|{type_}({desc}):\n"
+                    if desc
+                    else "\t" * tab_count + f"{obj}|{type_}:\n"
+                )
+                objstr += self.parse(tab_count + 1, data, descriptions_)
             elif isinstance(data, list):
                 if len(data) == 0:
                     continue
-                objstr = "\t" * tab_count + f"{obj}|{type_}:\n"
+                objstr = (
+                    "\t" * tab_count + f"{obj}|{type_}({desc}):\n"
+                    if desc
+                    else "\t" * tab_count + f"{obj}|{type_}:\n"
+                )
                 objstr += self.parse_list(data, tab_count + 1)
             else:
                 if isinstance(data, str):
@@ -70,7 +91,11 @@ class ParseObject:
                 if isinstance(data, (NoneType, bool)):
                     data = f'"{data}"'
                     type_ = "bool"
-                objstr = "\t" * tab_count + f"{obj}|{type_}={data}\n"
+                objstr = (
+                    "\t" * tab_count + f"{obj}|{type_}({desc})={data}\n"
+                    if desc
+                    else "\t" * tab_count + f"{obj}|{type_}={data}\n"
+                )
             str_ += objstr
             debug("Object String:", objstr)
         return str_
@@ -83,13 +108,13 @@ class ParseObject:
         """
         str_ = ""
         for i, obj in enumerate(datalist, 1):
-            type_, data = self.convertobject(obj)
+            type_, data, descriptions = self.convertobject(obj)
             if isinstance(data, dict):
                 if len(data) == 0:
                     continue
                 debug("Data:", data)
                 objstr = "\t" * tab_count + f"{type_}:\n"
-                objstr += self.parse(tab_count + 1, data)
+                objstr += self.parse(tab_count + 1, data, descriptions)
             elif isinstance(data, list):
                 if len(data) == 0:
                     continue

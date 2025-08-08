@@ -64,9 +64,7 @@ def time_from_data(
         minutes = int(data.split(":")[1])
         seconds = int(data.split(":")[2].split(".")[0])
         microseconds = (
-            int(data.split(":")[2].split(".")[1])
-            if "." in data.split(":")[2]
-            else 0
+            int(data.split(":")[2].split(".")[1]) if "." in data.split(":")[2] else 0
         )
     return time(hours, minutes, seconds, microseconds)
 
@@ -104,9 +102,7 @@ def timedelta_from_data(
             microseconds = 0
         seconds = int(seconds)
         microseconds = int(microseconds)
-    return timedelta(
-        days, seconds, microseconds, milliseconds, minutes, hours, weeks
-    )
+    return timedelta(days, seconds, microseconds, milliseconds, minutes, hours, weeks)
 
 
 def load() -> None:

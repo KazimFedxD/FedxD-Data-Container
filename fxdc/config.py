@@ -1,16 +1,20 @@
 import sys
 from collections.abc import Callable
 from types import NoneType
-from typing import Any, Optional, TypeAlias, TypeVar, Protocol, overload, get_args, get_origin
+from typing import (Any, Optional, Protocol, TypeAlias, TypeVar, get_args,
+                    get_origin, overload)
 
-from fxdc.exceptions import ClassAlreadyInitialized, FieldError, TypeCheckFailure, NullFailure, BlankFailure
+from fxdc.exceptions import (BlankFailure, ClassAlreadyInitialized, FieldError,
+                             NullFailure, TypeCheckFailure)
 from fxdc.fields import Field
 
 T = TypeVar("T", bound=type)
+
+
 class IdentityDeco(Protocol):
-    def __call__(self, arg: T, /) -> T:
-        ...
-        
+    def __call__(self, arg: T, /) -> T: ...
+
+
 TB = TypeVar("TB", bound=type)
 
 AcceptableTypes: TypeAlias = (
@@ -30,7 +34,7 @@ class _customclass:
         self.classname = classname
         self.class_ = class_
         self.from_data = from_data
-        self.meta_data = meta_data 
+        self.meta_data = meta_data
         if not from_data:
             if hasattr(class_, "__fromdata__"):
                 self.from_data = class_.__fromdata__
@@ -40,48 +44,47 @@ class _customclass:
                 self.to_data = class_.__todata__
 
     def __call__(self, *args: Any, **kwargs: Any) -> object:
-        
-        #Convert Verbose Names to kwargs
+        # Convert Verbose Names to kwargs
         newkwargs = {}
         for key, value in kwargs.items():
-            for original_name, verbose_name in self.meta_data.get("verbose_name", {}).items():
+            for original_name, verbose_name in self.meta_data.get(
+                "verbose_name", {}
+            ).items():
                 if key == verbose_name:
                     newkwargs[original_name] = value
                     break
             else:
                 newkwargs[key] = value
-        
-        
-        #Add Defaults
+
+        # Add Defaults
         for key, value in self.meta_data.get("default", {}).items():
             if key not in newkwargs:
                 newkwargs[key] = value
-        
-        #CHECKS
+
+        # CHECKS
         for key, value in newkwargs.items():
-            #Check Type Checking
+            # Check Type Checking
             if key in self.meta_data.get("typechecking", {}):
                 expected_type = self.meta_data["typechecking"][key]
                 if not isinstance(value, expected_type):
                     raise TypeCheckFailure(
                         f"Expected type {expected_type} for {key}, got {type(value)}"
                     )
-                    
-            #Check Nullability
+
+            # Check Nullability
             if key in self.meta_data.get("notnull", []):
                 if value is None:
                     raise NullFailure(f"Field {key} cannot be None")
-                
-                
-            #Check Blankness
+
+            # Check Blankness
             if key in self.meta_data.get("notblank", []):
                 if value == "":
                     raise BlankFailure(f"Field {key} cannot be blank")
-        
+
         for key in self.meta_data.get("notnull", []):
             if key not in newkwargs:
                 raise NullFailure(f"Field {key} cannot be None")
-        
+
         if self.from_data:
             return self.from_data(*args, **newkwargs)
         return self.class_(*args, **newkwargs)
@@ -94,24 +97,35 @@ class _customclass:
             data = self.to_data(obj)
         else:
             data = obj.__dict__
-        print("DATA: ", data, f"{type(data)=}")
         # Convert verbose names to keys
         if isinstance(data, dict):
-            new_data:dict[str, Any] = {}
+            new_data: dict[str, Any] = {}
             for key, value in data.items():
                 if key in self.meta_data.get("verbose_name", {}):
                     new_data[self.meta_data["verbose_name"][key]] = value
                 else:
                     new_data[key] = value
-            
+
             # Add defaults
             for key, value in self.meta_data.get("default", {}).items():
                 if key not in new_data:
                     new_data[key] = value
         else:
             new_data = data
-        print("DATA: ",data, new_data)
-        return new_data
+        descriptions: dict[str, str] = {}
+        for key, value in self.meta_data.get("description", {}).items():
+            if key in self.meta_data.get("verbose_name", {}):
+                descriptions[self.meta_data["verbose_name"][key]] = value
+            else:
+                descriptions[key] = value
+
+        if not descriptions:
+            descriptions = None
+
+        if isinstance(new_data, dict):
+            return new_data, descriptions
+
+        return new_data, {}
 
     def __str__(self) -> str:
         return "Custom Class: " + self.classname
@@ -141,7 +155,7 @@ class _config:
             T: The class that was added.
         """
         ...
-        
+
     @overload
     def add_class(
         self,
@@ -196,7 +210,7 @@ class _config:
             T: _description_
         """
         ...
-        
+
     def add_class(
         self,
         class_: Optional[object] = None,
@@ -235,7 +249,7 @@ class _config:
 
 
             Config.add_class("MyClass", class_=MyClass)"""
-        print(class_)
+
         def generate_meta_data(class_: type) -> dict[str, dict[str, Any]]:
             if not meta_data:
                 data = {
@@ -243,7 +257,8 @@ class _config:
                     "verbose_name": {},
                     "default": {},
                     "notnull": [],
-                    "notblank": []
+                    "notblank": [],
+                    "description": {},
                 }
             else:
                 data = meta_data
@@ -252,6 +267,7 @@ class _config:
                 data.setdefault("default", {})
                 data.setdefault("notnull", [])
                 data.setdefault("notblank", [])
+                data.setdefault("description", {})
             if typechecking:
                 for name, annotated_type in class_.__annotations__.items():
                     origin = get_origin(annotated_type)
@@ -269,9 +285,17 @@ class _config:
                                 f"Field {name} is typechecked but no type annotation found"
                             )
                         if get_origin(annotation) is Field:
-                            data["typechecking"][name] = get_args(annotation)[0]
+                            data["typechecking"][name] = (
+                                get_args(annotation)[0]
+                                if get_origin(get_args(annotation)[0]) is None
+                                else get_origin(get_args(annotation)[0])
+                            )
                         else:
-                            data["typechecking"][name] = annotation
+                            data["typechecking"][name] = (
+                                annotation
+                                if get_origin(annotation) is None
+                                else get_origin(annotation)
+                            )
                     if field.verbose_name:
                         data["verbose_name"][name] = field.verbose_name
                     if field.default is not None:
@@ -280,9 +304,9 @@ class _config:
                         data["notnull"].append(name)
                     if not field.blank:
                         data["notblank"].append(name)
+                    if field.desc:
+                        data["description"][name] = field.desc
             return data
-                            
-                         
 
         def wrapper(class_: T) -> T:
             if self.get_class_name(class_) in self.custom_classes_names:
@@ -316,6 +340,12 @@ class _config:
             if customclass.class_ is class_:
                 return customclass.classname
         return class_.__name__
+
+    def get_class(self, classname: str) -> Optional[_customclass]:
+        for customclass in self.custom_classes:
+            if customclass.classname == classname:
+                return customclass
+        return None
 
 
 Config = _config()

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "fxdc"
-version = "4.2"
+version = "5.0.0a2"
 description = "This Package Parses FxDC file and returns the object"
 readme = "README.md"
 requires-python = ">=3.10"
