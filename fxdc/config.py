@@ -44,10 +44,14 @@ class _customclass:
         #Convert Verbose Names to kwargs
         newkwargs = {}
         for key, value in kwargs.items():
-            if key in self.meta_data.get("verbose_name", {}):
-                newkwargs[self.meta_data["verbose_name"][key]] = value
+            for original_name, verbose_name in self.meta_data.get("verbose_name", {}).items():
+                if key == verbose_name:
+                    newkwargs[original_name] = value
+                    break
             else:
                 newkwargs[key] = value
+        
+        print(kwargs, newkwargs)
         
         #Add Defaults
         for key, value in self.meta_data.get("default", {}).items():
@@ -81,7 +85,7 @@ class _customclass:
         
         if self.from_data:
             return self.from_data(*args, **newkwargs)
-        return self.class_(*args, **kwargs)
+        return self.class_(*args, **newkwargs)
 
     def __repr__(self) -> str:
         return self.classname
