@@ -57,21 +57,21 @@ def load() -> None:
     Config.add_class(
         name="dict_items", class_=dict_items, from_data=dict_items_from_data
     )
+    Config.add_class(name="dict_keys", class_=dict_keys, from_data=dict_keys_from_data)
     Config.add_class(
-        name="dict_keys", class_=dict_keys, from_data=dict_keys_from_data
-    )
-    Config.add_class(
-        name= "dict_values", class_=dict_values, from_data=dict_values_from_data
+        name="dict_values", class_=dict_values, from_data=dict_values_from_data
     )
     Config.add_class(name="range", class_=range, from_data=range_from_data)
-    Config.add_class(name="zip", class_=zip, from_data=zip_from_data, )
     Config.add_class(
-        name= "map", class_=map, from_data=map_from_data, to_data=lambda x: list(x)
+        name="zip",
+        class_=zip,
+        from_data=zip_from_data,
+    )
+    Config.add_class(
+        name="map", class_=map, from_data=map_from_data, to_data=lambda x: list(x)
     )
     Config.add_class(name="filter", class_=filter, from_data=filter_from_data)
-    Config.add_class(
-        name="enumerate", class_=enumerate, from_data=enumerate_from_data
-    )
+    Config.add_class(name="enumerate", class_=enumerate, from_data=enumerate_from_data)
     Config.add_class(name="bytearray", class_=bytearray)
     Config.add_class(name="bytes", class_=bytes)
     Config.add_class(name="tuple", class_=tuple)

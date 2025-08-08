@@ -2,9 +2,7 @@
 class FXDCException(Exception):
     def __init__(self, *args, **kw) -> None:
         if self.__class__ is FXDCException:
-            raise RuntimeError(
-                "FXDCException should not be instantiated directly"
-            )
+            raise RuntimeError("FXDCException should not be instantiated directly")
         super().__init__(*args, **kw)
 
     def _get_code(self):
@@ -34,15 +32,18 @@ class InvalidJSONKey(FXDCException):
 class ClassAlreadyInitialized(FXDCException):
     code = 7
 
+
 class FieldError(FXDCException):
     code = 8
 
+
 class TypeCheckFailure(FXDCException):
     code = 9
-    
+
+
 class NullFailure(FXDCException):
     code = 10
 
+
 class BlankFailure(FXDCException):
     code = 11
-    

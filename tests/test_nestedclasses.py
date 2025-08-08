@@ -1,10 +1,11 @@
 from __future__ import annotations
-import json
+
 from typing import Any, Optional
 
 from fxdc import Config, dumps, loads
 
 emojis = {}
+
 
 @Config.add_class
 class Item:
@@ -61,13 +62,13 @@ class Block(Item):
         if not isinstance(other, Block):
             return False
         return (
-            self.name == other.name and
-            self.rarity == other.rarity and
-            self.startingY == other.startingY and
-            self.endingY == other.endingY and
-            self.item == other.item and
-            self.itemrange == other.itemrange and
-            self.hardness == other.hardness
+            self.name == other.name
+            and self.rarity == other.rarity
+            and self.startingY == other.startingY
+            and self.endingY == other.endingY
+            and self.item == other.item
+            and self.itemrange == other.itemrange
+            and self.hardness == other.hardness
         )
 
     def copy(self) -> Block:
@@ -87,22 +88,20 @@ class Enchantment:
     def __init__(self, name: str, level: int):
         self.name = name
         self.level = level
-    
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Enchantment):
             return False
         return self.name == other.name and self.level == other.level
-    
+
     def __hash__(self) -> int:
         return hash(self.name)
-    
+
     def __repr__(self) -> str:
         return f"{self.name} {self.level}"
-    
+
     def __str__(self) -> str:
         return f"{self.name}"
-    
-    
 
 
 @Config.add_class
@@ -165,14 +164,14 @@ class Consumable(Item):
         super().__init__(name)
         self.effect = effect
         self.duration = duration
-    
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Consumable):
             return False
         return (
-            self.name == other.name and
-            self.effect == other.effect and
-            self.duration == other.duration
+            self.name == other.name
+            and self.effect == other.effect
+            and self.duration == other.duration
         )
 
 
@@ -182,22 +181,18 @@ class Food(Consumable):
         super().__init__(name, "food", 0)
         self.health = health
         self.hunger = hunger
-    
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Food):
             return False
         return (
-            self.name == other.name and
-            self.health == other.health and
-            self.hunger == other.hunger
+            self.name == other.name
+            and self.health == other.health
+            and self.hunger == other.hunger
         )
-        
+
     def __todata__(self) -> dict[str, Any]:
-        return {
-            "name": self.name,
-            "health": self.health,
-            "hunger": self.hunger
-        }
+        return {"name": self.name, "health": self.health, "hunger": self.hunger}
 
 
 @Config.add_class
@@ -205,15 +200,15 @@ class Potion(Consumable):
     def __init__(self, name: str, effect: str, duration: int, level: int = 1):
         super().__init__(name, effect, duration)
         self.level = level
-    
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Potion):
             return False
         return (
-            self.name == other.name and
-            self.effect == other.effect and
-            self.duration == other.duration and
-            self.level == other.level
+            self.name == other.name
+            and self.effect == other.effect
+            and self.duration == other.duration
+            and self.level == other.level
         )
 
 
@@ -223,27 +218,28 @@ class Fluid(Item):
         super().__init__(name)
         self.damage = damage
         self.rarity = rarity
-    
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Fluid):
             return False
         return (
-            self.name == other.name and
-            self.damage == other.damage and
-            self.rarity == other.rarity
+            self.name == other.name
+            and self.damage == other.damage
+            and self.rarity == other.rarity
         )
+
 
 @Config.add_class
 class Stack:
     def __init__(self, item: Item, amount: int):
         self.item = item
         self.amount = amount
-    
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Stack):
             return False
         return self.item == other.item
-    
+
     def add(self):
         if self.amount < self.item.max_stack:
             self.amount += 1
@@ -260,9 +256,10 @@ class Stack:
 
     def __str__(self):
         return f"{self.item.name} x{self.amount}"
-    
+
     def __repr__(self):
         return f"{self.item.name} x{self.amount}"
+
 
 @Config.add_class
 class Inventory:
@@ -271,7 +268,7 @@ class Inventory:
         self.max_slots = 36
 
     @staticmethod
-    def __fromdata__(**data:Any) -> Inventory:
+    def __fromdata__(**data: Any) -> Inventory:
         inv = Inventory()
         if data.get("items"):
             inv.items = data["items"]
@@ -280,10 +277,7 @@ class Inventory:
         return inv
 
     def __todata__(self) -> dict[str, Any]:
-        return {
-            "items": self.items,
-            "max_slots": self.max_slots
-        }
+        return {"items": self.items, "max_slots": self.max_slots}
 
     def add(self, item: Item, amount: int = 1):
         for stack in self.items:
@@ -297,7 +291,7 @@ class Inventory:
         if len(self.items) == self.max_slots:
             raise Exception("Inventory is full")
         self.items.append(Stack(item, amount))
-        
+
     def remove(self, item: Item, amount: int = 1):
         for stack in self.items:
             if stack.item == item:
@@ -310,14 +304,14 @@ class Inventory:
                     self.items.remove(stack)
             if amount == 0:
                 break
-        if amount :
+        if amount:
             raise Exception("Not enough items in inventory")
         else:
             return
-        
+
     def __str__(self):
         return "\n".join([str(stack) for stack in self.items])
-    
+
     def __repr__(self):
         return "\n".join([repr(stack) for stack in self.items])
 
@@ -325,21 +319,22 @@ class Inventory:
         if not isinstance(other, Inventory):
             return False
         return self.items == other.items
-    
+
     def __hash__(self) -> int:
         return hash(tuple(self.items))
-    
+
     def copy(self) -> Inventory:
         inv = Inventory()
         inv.items = [stack for stack in self.items]
         return inv
-    
+
     def __getitem__(self, item: Item) -> int:
         for stack in self.items:
             if stack.item == item:
                 return stack.amount
         return 0
-    
+
+
 @Config.add_class
 class Player:
     def __init__(self, name: str, inventory: Inventory):
@@ -355,36 +350,36 @@ class Player:
         self.sword = None
         self.reserved_armor = []
         self.reserved_tools = []
-    
+
     def __str__(self):
         return self.name
-    
+
     def __repr__(self):
         return self.name
-    
+
     def __hash__(self) -> int:
         return hash(self.name)
-    
-    def __eq__(self, other: Player) -> bool:    
+
+    def __eq__(self, other: Player) -> bool:
         if not isinstance(other, Player):
             return False
         return (
-            self.name == other.name and
-            self.inventory == other.inventory and
-            self.hunger == other.hunger and
-            self.health == other.health and
-            self.helmet == other.helmet and
-            self.chestplate == other.chestplate and
-            self.leggings == other.leggings and
-            self.boots == other.boots and
-            self.pickaxe == other.pickaxe and
-            self.sword == other.sword and
-            self.reserved_armor == other.reserved_armor and
-            self.reserved_tools == other.reserved_tools
+            self.name == other.name
+            and self.inventory == other.inventory
+            and self.hunger == other.hunger
+            and self.health == other.health
+            and self.helmet == other.helmet
+            and self.chestplate == other.chestplate
+            and self.leggings == other.leggings
+            and self.boots == other.boots
+            and self.pickaxe == other.pickaxe
+            and self.sword == other.sword
+            and self.reserved_armor == other.reserved_armor
+            and self.reserved_tools == other.reserved_tools
         )
-    
+
     @staticmethod
-    def __fromdata__(**data:Any) -> Player:
+    def __fromdata__(**data: Any) -> Player:
         player = Player(data["name"], data["inventory"])
         if data.get("hunger"):
             player.hunger = data["hunger"]
@@ -407,7 +402,7 @@ class Player:
         if data.get("reserved_tools"):
             player.reserved_tools = data["reserved_tools"]
         return player
-    
+
 
 def getplayer():
     inventory = Inventory()
@@ -422,8 +417,12 @@ def getplayer():
     pick = Tool("iron pickaxe", 250, 5, 2, [Enchantment("efficiency", 3)])
     sword = Tool("iron sword", 250, 7, 2, [Enchantment("sharpness", 3)])
     helmet = Armor("iron helmet", "helmet", 250, 2, [Enchantment("protection", 3)])
-    chestplate = Armor("iron chestplate", "chestplate", 250, 5, [Enchantment("protection", 3)])
-    leggings = Armor("iron leggings", "leggings", 250, 3, [Enchantment("protection", 3)])
+    chestplate = Armor(
+        "iron chestplate", "chestplate", 250, 5, [Enchantment("protection", 3)]
+    )
+    leggings = Armor(
+        "iron leggings", "leggings", 250, 3, [Enchantment("protection", 3)]
+    )
     boots = Armor("iron boots", "boots", 250, 2, [Enchantment("protection", 3)])
     reserved_armor = [helmet, chestplate, leggings, boots]
     reserved_tools = [pick, sword]
@@ -437,6 +436,7 @@ def getplayer():
     player.reserved_armor = reserved_armor
     player.reserved_tools = reserved_tools
     return player
+
 
 def test_nested_classes():
     player = getplayer()
@@ -452,7 +452,7 @@ def test_nested_classes():
     print("Reserved Tools:", player.reserved_tools)
     serialized_player = dumps(player)
     print("Serialized Player:", serialized_player)
-    loaded_player:Player = loads(serialized_player).original
+    loaded_player: Player = loads(serialized_player).original
     print("Loaded Player Name:", loaded_player.name)
     print("Loaded Inventory:", loaded_player.inventory)
     print("Loaded Helmet:", loaded_player.helmet)
@@ -463,5 +463,5 @@ def test_nested_classes():
     print("Loaded Sword:", loaded_player.sword)
     print("Loaded Reserved Armor:", loaded_player.reserved_armor)
     print("Loaded Reserved Tools:", loaded_player.reserved_tools)
-    
+
     assert player == loaded_player, "Loaded player does not match original player"
