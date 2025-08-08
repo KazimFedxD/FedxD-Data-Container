@@ -1,9 +1,13 @@
 from __future__ import annotations
 
+import string
 from typing import Any, Optional, TypeVar, Generic
+
+from fxdc.exceptions import FieldError
 
 T = TypeVar('T')
 
+ACCEPTABLECHARACTERS = string.ascii_letters + string.digits + "_"
 
 class Field(Generic[T]):
     def __init__(
@@ -11,9 +15,13 @@ class Field(Generic[T]):
         verbose_name: Optional[str] = None,
         default: Optional[Any] = None,
         typechecking: bool = True,
-        null: bool = False,
-        blank: bool = False
+        null: bool = True,
+        blank: bool = True
     ):
+        if verbose_name[0] not in string.ascii_letters:
+            raise FieldError("Name Should Start With A Letter")
+        if any([x not in ACCEPTABLECHARACTERS for x in verbose_name]):
+            raise FieldError("Name Should Only Contain Letters, Digits and Underscore")
         self.__verbose_name = verbose_name
         self.__default = default
         self.__typechecking = typechecking

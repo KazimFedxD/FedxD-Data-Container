@@ -33,3 +33,16 @@ class InvalidJSONKey(FXDCException):
 
 class ClassAlreadyInitialized(FXDCException):
     code = 7
+
+class FieldError(FXDCException):
+    code = 8
+
+class TypeCheckFailure(FXDCException):
+    code = 9
+    
+class NullFailure(FXDCException):
+    code = 10
+
+class BlankFailure(FXDCException):
+    code = 11
+    
