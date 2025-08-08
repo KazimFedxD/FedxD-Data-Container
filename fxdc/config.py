@@ -51,7 +51,6 @@ class _customclass:
             else:
                 newkwargs[key] = value
         
-        print(kwargs, newkwargs)
         
         #Add Defaults
         for key, value in self.meta_data.get("default", {}).items():
@@ -93,21 +92,25 @@ class _customclass:
     def return_data(self, obj: object) -> dict[str, Any]:
         if self.to_data:
             data = self.to_data(obj)
-        data = obj.__dict__
-        
+        else:
+            data = obj.__dict__
+        print("DATA: ", data, f"{type(data)=}")
         # Convert verbose names to keys
-        new_data:dict[str, Any] = {}
-        for key, value in data.items():
-            if key in self.meta_data.get("verbose_name", {}):
-                new_data[self.meta_data["verbose_name"][key]] = value
-            else:
-                new_data[key] = value
-        
-        # Add defaults
-        for key, value in self.meta_data.get("default", {}).items():
-            if key not in new_data:
-                new_data[key] = value
-                    
+        if isinstance(data, dict):
+            new_data:dict[str, Any] = {}
+            for key, value in data.items():
+                if key in self.meta_data.get("verbose_name", {}):
+                    new_data[self.meta_data["verbose_name"][key]] = value
+                else:
+                    new_data[key] = value
+            
+            # Add defaults
+            for key, value in self.meta_data.get("default", {}).items():
+                if key not in new_data:
+                    new_data[key] = value
+        else:
+            new_data = data
+        print("DATA: ",data, new_data)
         return new_data
 
     def __str__(self) -> str:
@@ -232,7 +235,7 @@ class _config:
 
 
             Config.add_class("MyClass", class_=MyClass)"""
-
+        print(class_)
         def generate_meta_data(class_: type) -> dict[str, dict[str, Any]]:
             if not meta_data:
                 data = {
@@ -279,16 +282,15 @@ class _config:
                         data["notblank"].append(name)
             return data
                             
-                        
+                         
 
         def wrapper(class_: T) -> T:
             if self.get_class_name(class_) in self.custom_classes_names:
                 raise ClassAlreadyInitialized(
-                    f"Class {name} already exists"
+                    f"Class {self.get_class_name(class_)} already exists"
                 )
 
             meta = generate_meta_data(class_)
-            print(f"Meta Data: {meta}")
             c: _customclass = _customclass(
                 name or class_.__name__, class_, meta, from_data, to_data
             )
@@ -304,6 +306,7 @@ class _config:
     def remove_class(self, classname: str) -> None:
         delattr(self, classname)
         self.custom_classes.pop(self.custom_classes_names.index(classname))
+        self.custom_classes_names.remove(classname)
 
     def set_recursion_limit(self, limit: int = 1000) -> None:
         sys.setrecursionlimit(limit)
