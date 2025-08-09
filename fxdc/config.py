@@ -1,4 +1,5 @@
 from json import load
+import os
 import sys
 from collections.abc import Callable
 from types import NoneType
@@ -345,7 +346,7 @@ class _config:
                 return customclass
         return None
 
-    def export_config(self):
+    def export_config(self, file: str = "config.fxdc"):
         """
         Exports All The MetaData Of Every Class Loaded Into The Config
         Converts To a FxDC String and Writes to `config.fxdc`
@@ -368,7 +369,7 @@ class _config:
             raise NoConfigFound("No classes to export in the config")
         from fxdc import dumps
         config_str = "!CONFIG FILE!\n\n" + dumps(config)
-        with open("config.fxdc", "w") as f:
+        with open(file, "w") as f:
             f.write(config_str)
         print("Config exported to config.fxdc")
     
@@ -378,7 +379,8 @@ class _config:
         Reads the file and adds the classes to the config
         """
         from fxdc.read import loads
-
+        if not os.path.exists(file):
+            raise NoConfigFound("Config Not Found")
         with open(file, "r") as f:
             data = f.read()
         if not data.startswith("!CONFIG FILE!"):
