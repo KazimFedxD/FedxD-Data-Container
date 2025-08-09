@@ -1,11 +1,12 @@
+from json import load
 import sys
 from collections.abc import Callable
 from types import NoneType
 from typing import (Any, Optional, Protocol, TypeAlias, TypeVar, get_args,
                     get_origin, overload)
 
-from fxdc.exceptions import (BlankFailure, ClassAlreadyInitialized, FieldError,
-                             NullFailure, TypeCheckFailure)
+from fxdc.exceptions import (BlankFailure, ClassAlreadyInitialized, FieldError, NoConfigFound,
+                             NullFailure, TypeCheckFailure, ClassNotLoaded)
 from fxdc.fields import Field
 
 T = TypeVar("T", bound=type)
@@ -21,6 +22,14 @@ AcceptableTypes: TypeAlias = (
     int | float | str | bool | list[Any] | dict[str, Any] | NoneType
 )
 
+DEFAULT_TYPES = {
+    "str": str,
+    "int": int,
+    "float": float,
+    "bool": bool,
+    "list": list,
+    "dict": dict,
+}
 
 class _customclass:
     def __init__(
@@ -143,18 +152,7 @@ class _config:
         self.custom_classes: list[_customclass] = []
         self.custom_classes_names: list[str] = []
         self.debug__: bool = False
-
-    @overload
-    def add_class(self, class_: T, /) -> T:
-        """Add a class to the config
-
-        Args:
-            class_ (T): The class to add.
-
-        Returns:
-            T: The class that was added.
-        """
-        ...
+    
 
     @overload
     def add_class(
@@ -188,7 +186,7 @@ class _config:
     @overload
     def add_class(
         self,
-        class_: Optional[T] = None,
+        class_: T,
         *,
         name: Optional[str] = None,
         from_data: Optional[Callable[..., object]] = None,
@@ -346,6 +344,72 @@ class _config:
             if customclass.classname == classname:
                 return customclass
         return None
+
+    def export_config(self):
+        """
+        Exports All The MetaData Of Every Class Loaded Into The Config
+        Converts To a FxDC String and Writes to `config.fxdc`
+        """
+        config = {}
+        for customclass in self.custom_classes:
+            print(f"Exporting {customclass.classname} to config")
+            if any(len(x) > 0 for x in customclass.meta_data.values()):
+                print(f"Meta Data: {customclass.meta_data}")
+                meta = customclass.meta_data.copy()
+                meta["typechecking"] = {}
+                if len(customclass.meta_data["typechecking"]) > 0:
+                    print("TypeChecking: ", customclass.meta_data["typechecking"])
+                    for key, value in customclass.meta_data["typechecking"].items():
+                        meta["typechecking"][key] = value.__name__
+
+                config["Config_"+customclass.classname] = meta
+
+        if not config:
+            raise NoConfigFound("No classes to export in the config")
+        from fxdc import dumps
+        config_str = "!CONFIG FILE!\n\n" + dumps(config)
+        with open("config.fxdc", "w") as f:
+            f.write(config_str)
+        print("Config exported to config.fxdc")
+    
+    def import_config(self, file: str = "config.fxdc") -> None:
+        """
+        Imports Config From a FxDC File
+        Reads the file and adds the classes to the config
+        """
+        from fxdc.read import loads
+
+        with open(file, "r") as f:
+            data = f.read()
+        if not data.startswith("!CONFIG FILE!"):
+            raise NoConfigFound("Invalid config file format")
+        
+        data:dict[str, dict] = loads(data).original
+        for classname, meta_data in data.items():
+            classname = classname[7:]
+            if classname not in self.custom_classes_names:
+                raise ClassNotLoaded(
+                    f"Class {classname} is not loaded in the config"
+                )
+            customclass = self.get_class(classname)
+            meta = meta_data.copy()
+            meta["typechecking"] = {}
+            if meta_data.get("typechecking", None):
+                for key, value in meta_data["typechecking"].items():
+                    if value in DEFAULT_TYPES:
+                        class_ = DEFAULT_TYPES[value]
+                    else:
+                        loadedclass = self.get_class(value)
+                        if not loadedclass:
+                            raise ClassNotLoaded(
+                                f"The Class {value} is not loaded into the config"
+                            )
+                        class_ = loadedclass.class_
+                    meta["typechecking"][key] = class_
+            customclass.meta_data = meta
+                    
+        print(f"Config imported from {file}")
+    
 
 
 Config = _config()
