@@ -70,6 +70,9 @@ KEYWORDS = [
 class Lexer:
     def __init__(self, text: str, classes: list[str] = []) -> None:
         self.text = text
+        if self.text.startswith("!CONFIG FILE!"):
+            print("Config file detected, Loading Config")
+            self.text = self.text[14:]
         self.pos = -1
         self.line = 1
         self.current_char = None

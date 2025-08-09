@@ -47,3 +47,9 @@ class NullFailure(FXDCException):
 
 class BlankFailure(FXDCException):
     code = 11
+
+class ClassNotLoaded(FXDCException):
+    code = 12
+    
+class NoConfigFound(FXDCException):
+    code = 13
