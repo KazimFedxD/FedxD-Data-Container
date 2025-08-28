@@ -10,13 +10,11 @@ except ImportError:
     debug("Pandas not found, Pandas Default Classes will not work")
 
 if pd:
-    import json
-
     from pandas import DataFrame
 
     def data_frame_to_data(data_frame: DataFrame) -> dict[str, Any]:
         data = data_frame.to_dict()
-        returndata:dict[str, Any] = {}
+        returndata: dict[str, Any] = {}
         for key, value in data.items():
             returndata[key] = list(value.values())
         return returndata

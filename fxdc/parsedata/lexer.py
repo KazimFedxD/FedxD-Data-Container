@@ -22,6 +22,7 @@ class Token:
             "DEVIDER",
             "EQUAL",
             "COLON",
+            "DESC",
         ],
         value: Optional[str] = None,
         line: Optional[int] = None,
@@ -49,6 +50,7 @@ TT_INDENT = "INDENT"
 TT_DEVIDER = "DEVIDER"
 TT_EQUAL = "EQUAL"
 TT_COLON = "COLON"
+TT_DESC = "DESC"
 
 NUMS = "0123456789"
 LETTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_"
@@ -68,6 +70,9 @@ KEYWORDS = [
 class Lexer:
     def __init__(self, text: str, classes: list[str] = []) -> None:
         self.text = text
+        if self.text.startswith("!CONFIG FILE!"):
+            print("Config file detected, Loading Config")
+            self.text = self.text[14:]
         self.pos = -1
         self.line = 1
         self.current_char = None
@@ -76,9 +81,7 @@ class Lexer:
 
     def advance(self) -> None:
         self.pos += 1
-        self.current_char = (
-            self.text[self.pos] if self.pos < len(self.text) else None
-        )
+        self.current_char = self.text[self.pos] if self.pos < len(self.text) else None
 
     def make_tokens(self) -> list[Token]:
         tokens: list[Token] = []
@@ -107,23 +110,30 @@ class Lexer:
                 self.advance()
             elif self.current_char in "#":
                 self.skip_comments()
+            elif self.current_char == "(":
+                self.advance()
+                tokens.append(self.make_desc())
 
             else:
                 char = self.current_char
                 self.advance()
-                raise InvalidData(
-                    f"Invalid character {char} at line {self.line}"
-                )
+                raise InvalidData(f"Invalid character {char} at line {self.line}")
 
         tokens.append(Token(TT_EOF, line=self.line))
         return tokens
 
+    def make_desc(self) -> Token:
+        desc_str = ""
+        while self.current_char is not None and self.current_char != ")":
+            desc_str += self.current_char
+            self.advance()
+        self.advance()
+        return Token(TT_DESC, desc_str, line=self.line)
+
     def make_number(self) -> Token:
         num_str = ""
         dot_count = 0
-        while (
-            self.current_char is not None and self.current_char in NUMS + ".-"
-        ):
+        while self.current_char is not None and self.current_char in NUMS + ".-":
             if self.current_char == ".":
                 if dot_count == 1:
                     break
@@ -131,9 +141,7 @@ class Lexer:
                 num_str += "."
             elif self.current_char == "-":
                 if len(num_str) > 0:
-                    raise InvalidData(
-                        f"Invalid character '-' at line {self.line}"
-                    )
+                    raise InvalidData(f"Invalid character '-' at line {self.line}")
                 num_str += "-"
             else:
                 num_str += self.current_char
@@ -146,8 +154,7 @@ class Lexer:
     def make_identifier(self) -> Token:
         id_str = ""
         while (
-            self.current_char is not None
-            and self.current_char in LETTERS_DIGITS + "."
+            self.current_char is not None and self.current_char in LETTERS_DIGITS + "."
         ):
             id_str += self.current_char
             self.advance()

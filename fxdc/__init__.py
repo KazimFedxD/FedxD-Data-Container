@@ -1,5 +1,6 @@
 from .config import Config
 from .defaultclasses import load_default_classes
+from .fields import Field as FxDCField
 from .json import fxdc_to_json as to_json
 from .parsedata import *
 from .read import load, loads
@@ -16,6 +17,7 @@ __all__ = [
     "dumps",
     "dump",
     "to_json",
+    "FxDCField",
 ]
 
 load_default_classes()

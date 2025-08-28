@@ -311,6 +311,274 @@ print(json_str)
 
 ---
 
+## 🧰 Advanced Class Integration
+
+FxDC now supports enhanced **type checking** and rich metadata for class variables via the `FxDCField` helper. This feature enables automatic validation, default values, and improved documentation generated from your class definitions, making your data models more robust and user-friendly.
+
+### Declaring Fields with `FxDCField`
+
+Use `FxDCField` to declare variables with additional metadata and validation options:
+
+- **desc**: A textual description of the field, which will be included in the FxDC output to help document the data.
+- **verbose_name**: A human-friendly or display name for the field, used in the FxDC output instead of the actual variable name for clarity.
+- **default**: A default value assigned to the field if it is missing in the input data during loading.
+- **typechecking**: Enables type validation when loading the FxDC data.
+- **null**: Indicates whether the field can accept `None` as a value.
+- **blank**: Indicates whether the field can be omitted or left empty.
+
+---
+
+### Verbose Name
+
+The `verbose_name` parameter allows you to specify a human-friendly or display name for a field. This name will be used in the FxDC output instead of the variable name, making the data file easier to read and understand for end users or documentation purposes. It is especially helpful when variable names are abbreviated, technical, or not descriptive enough on their own.
+
+Example:
+
+```python
+from fxdc import FxDCField, Config
+
+@Config.add_class
+class User:
+    name: FxDCField[str] = FxDCField(verbose_name="username")
+    age: int
+```
+
+**FxDC output:**
+
+```fxdc
+main|User:
+    username|str = "JohnDoe"
+    age|int = 30
+```
+
+---
+
+### Default Value
+
+The `default` parameter provides a fallback value for a field if it is missing from the FxDC input during loading. This is useful for ensuring that your data objects always have valid values, even when the input is incomplete. It helps prevent errors caused by missing data and simplifies your data validation logic by centralizing defaults within the class definition.
+
+Example:
+
+```python
+@Config.add_class
+class User:
+    name: FxDCField[str] = FxDCField(default="Guest")
+    age: int
+```
+
+If the `name` field is not present in the FxDC data, it will automatically be set to `"Guest"` after loading. The output data might look like this:
+
+```fxdc
+main|User:
+    age|int = 25
+    name|str = "Guest"
+```
+
+This mechanism makes your FxDC-defined classes more robust and easier to maintain, especially when working with optional or evolving data schemas.
+
+---
+
+### Field Descriptions in FxDC Output
+
+You can provide a descriptive `desc` for each field, which will be included in parentheses next to the type in the FxDC output for better documentation and clarity:
+
+```python
+@Config.add_class
+class User:
+    username: FxDCField[str] = FxDCField(desc="The username of the user")
+    age: FxDCField[int] = FxDCField(desc="The age of the user")
+```
+
+**FxDC output:**
+
+```fxdc
+main|User:
+    username|str(The username of the user) = "john_doe"
+    age|int(The age of the user) = 30
+```
+
+---
+
+### Enabling Type Checking Globally for a Class
+
+You can enable type checking for all variables declared in a class by passing the `typechecking=True` argument to `Config.add_class()`. This enforces type validation on every field during FxDC parsing.
+
+```python
+@Config.add_class(typechecking=True)
+class User:
+    name: FxDCField[str] = FxDCField(desc="User's full name")
+    age: FxDCField[int] = FxDCField(desc="User's age")
+```
+
+---
+
+### Manual Per-Variable Type Checking
+
+Alternatively, you can control type checking on a per-variable basis by setting the `typechecking` parameter individually in `FxDCField`. This provides fine-grained control even if global class type checking is disabled or enabled.
+
+```python
+@Config.add_class
+class Product:
+    name: FxDCField[str] = FxDCField(typechecking=True, desc="Product name")
+    price: FxDCField[float] = FxDCField(typechecking=False, desc="Price without validation")
+```
+
+In this example, `name` will be type-checked during loading, but `price` will bypass type validation.
+
+---
+
+### Manual Metadata Configuration for Imported or External Classes
+
+For advanced use cases—such as integrating third-party or imported classes that you cannot modify—you can manually provide metadata to `Config.add_class()` using the `meta_data` argument. This dictionary allows you to specify all field metadata externally, including type checking, descriptions, verbose names, default values, and null/blank constraints.
+
+Example:
+
+```python
+from fxdc import Config, FxDCField
+
+class User:
+    username: FxDCField[str] = FxDCField(desc="The username of the user")
+    age: FxDCField[int] = FxDCField(desc="The age of the user")
+
+    def __init__(self, username: str, age: int):
+        self.username = username
+        self.age = age
+
+User = Config.add_class(User, meta_data={
+    "typechecking": {
+        "username": str,
+        "age": int
+    },
+    "description": {
+        "username": "The username of the user",
+        "age": "The age of the user"
+    },
+    "verbose_name": {
+        "username": "name",
+    },
+    "default": {
+        "username": "default_user",
+    },
+    "notnull": {
+        "username": True,
+        "age": True
+    },
+    "notblank": {
+        "username": False,
+        "age": False
+    }
+})
+```
+
+This approach gives you full control over field behavior and validation even when working with classes that lack built-in FxDC metadata.
+
+---
+
+## ⚙️ Configuration Export & Import  
+
+From this update onward, **FxDC** can now **save** and **reload** all your class metadata using **configuration files**!  
+Think of it as a **blueprint** for your classes — portable, sharable, and always ready to reload. 🚀  
+
+---
+
+### ⚠️ Important Warning  
+> **All classes present in the configuration file _must_ be loaded into `Config` before importing it.**  
+> If a class in the config file isn’t already registered with `Config`, the import will fail.  
+> This ensures FxDC can correctly link metadata to the right classes.  
+
+---
+
+### 📦 What Gets Saved?  
+When you export a config, FxDC will keep:  
+- 🏷 **Type definitions** → `username` must be `str`, `age` must be `int`  
+- 📝 **Descriptions** → for better understanding  
+- 🪪 **Verbose names** → human-friendly labels  
+- 🎯 **Default values** → pre-set starting data  
+- ✅ **Constraints** → like `notnull` or `notblank`  
+
+💡 **In short:** Everything needed to recreate your class exactly as you defined it — without touching a single line of code again.  
+
+---
+
+### 📤 Exporting Configurations  
+
+```python
+Config.export_config()
+```
+- Saves **all registered classes** into `config.fxdc` by default.  
+- Want a custom file name? No problem:  
+```python
+Config.export_config("user_data_config.fxdc")
+```
+
+---
+
+### 📥 Importing Configurations  
+
+```python
+Config.import_config()
+```
+- Loads `config.fxdc` by default.  
+- Want to load a different file? Easy:  
+```python
+Config.import_config("user_data_config.fxdc")
+```
+
+---
+
+### 💻 Full Example  
+
+```python
+from fxdc import Config, FxDCField
+
+@Config.add_class
+class User:
+    username: FxDCField[str] = FxDCField(desc="The username of the user")
+    age: FxDCField[int] = FxDCField(desc="The age of the user")
+
+# Save the configuration
+Config.export_config("user_config.fxdc")
+
+# ... Later or in another project ...
+Config.import_config("user_config.fxdc")
+
+# ✅ Metadata is instantly available!
+```
+
+---
+
+### 🗂 Example Config File  
+
+```plaintext
+!CONFIG FILE!
+
+Config_User|dict:
+	typechecking|dict:
+		username|str="str"
+		age|str="int"
+	verbose_name|dict:
+		username|str="name"
+	default|dict:
+		username|str="guest"
+	notnull|list:
+		str="username"
+	notblank|list:
+		str="username"
+	description|dict:
+		username|str="name of the user"
+		age|str="age of the user"
+```
+
+---
+
+### 🌟 Why You’ll Love This  
+- 🔄 **Reusable** — no more redefining metadata in every file.  
+- 📂 **Portable** — move configs between projects effortlessly.  
+- 🤝 **Collaboration-friendly** — share with teammates for consistent setups.  
+- ⏱ **Time-saving** — load everything in one command.  
+
+---
+
 ## 🔁 Recursive Depth Control
 
 FxDC uses recursive loading. If parsing fails due to recursion errors (especially with deeply nested structures), you can increase the limit:
@@ -326,23 +594,44 @@ Config.set_recursion_limit(10000)  # Default is 1000
 
 ## ❗ Exceptions
 
-FxDC includes custom exceptions to provide better error handling and debugging support when loading, dumping, parsing, or working with typed objects and classes. All custom exceptions inherit from the base `FXDCException`, which itself is not intended to be raised directly.
+FxDC includes **custom exceptions** to provide better error handling and debugging support when loading, dumping, parsing, or working with typed objects and classes.  
+All custom exceptions inherit from the base **`FXDCException`** *(not intended to be raised directly)*.
 
-Here are the primary exceptions:
+---
 
-* **FXDCException** *(base class)*: The root of all FxDC exceptions. Cannot be raised directly.
+### 🏛 **Base Exception**
+- **`FXDCException`** *(base class)* — 🏷 The root of all FxDC exceptions.  
+  🚫 **Cannot** be raised directly.
 
-* **InvalidExtension**: Raised if the `load()` function receives a file that does not have the `.fxdc` extension.
+---
 
-* **FileNotReadable**: Raised when a file cannot be read, either due to permission issues or other I/O errors.
+### 📂 **File & Extension Errors**
+- **`InvalidExtension`** — 📄 Raised if `load()` receives a file without the **`.fxdc`** extension.  
+- **`FileNotReadable`** — 🚫 Raised when a file cannot be read due to **permissions** or other I/O errors.  
+- **`FileNotWritable`** — ✏ Raised during `dump()` if the provided path **cannot be edited** or written to.
 
-* **FileNotWritable**: Raised during `dump()` if the provided file path cannot be edited or written to.
+---
 
-* **InvalidData**: Raised during lexing or parsing if the structure of the FxDC data is incorrect, does not match the expected configuration, or if a required class was not registered using `Config.add_class()`. This can also occur if a variable shares a name with a registered class, potentially generating incorrect tokens during parsing.
+### 📜 **Data & Parsing Errors**
+- **`InvalidData`** — 🛑 Raised during **lexing or parsing** when:
+  - The FxDC structure is invalid or mismatches the configuration.  
+  - A required class is missing from `Config.add_class()`.  
+  - A variable name conflicts with a registered class name.
+- **`InvalidJSONKey`** — 🔑 Raised when a dictionary contains an **invalid JSON key**.
+- **`ClassNotLoaded`** — 📦 Raised when a **referenced class** in an FxDC or config file is not loaded into the configuration.  
+- **`NoConfigFound`** — 📁 Raised when the **configuration file is missing**, invalid, or corrupted.
 
-* **InvalidJSONKey**: Raised when a dictionary contains an invalid JSON key.
+---
 
-* **ClassAlreadyInitialized**: Raised when attempting to add a class to the configuration using a name that already exists or is already registered.
+### 🏗 **Field Validation Errors**
+- **`FieldError`** — ⚠ Raised when there’s an error **creating a field**, e.g.:
+  - No type specified for type checking.  
+  - Description too long.
+- **`TypeCheckFailure`** — 📏 Raised when a field’s **value type** does not match the expected type.  
+- **`NullFailure`** — 🚫 Raised when a **non-null** field contains a `null` (`None`) value.  
+- **`BlankFailure`** — ❌ Raised when a **non-blank** field is empty or contains only whitespace.
+
+---
 
 ---
 
@@ -422,6 +711,47 @@ main|User:
 * Feedback and suggestions are welcome! If you have any ideas or concerns, please open an issue or contribute via a pull request on the [GitHub repository](https://github.com/KazimFedxD/FedxD-Data-Container).
 
 ---
+
+## 🤝 Contributions
+
+We welcome contributions to improve FxDC — from fixing typos to adding new features or optimizing performance.  
+Whether you’re a developer, tester, or just an enthusiastic user, your help is valuable.  
+
+---
+
+### 🛠 How to Contribute
+1. **Fork** the repository.
+2. **Create** a feature branch (`git checkout -b feature-name`).
+3. **Commit** your changes with clear messages.
+4. **Push** to your branch.
+5. **Open a Pull Request** with details about your changes.
+
+💡 Please follow the existing code style and write clear commit messages.
+
+---
+
+### 🧪 Beta Testers
+Beta testers are crucial for ensuring **FxDC’s stability** before public releases.  
+They help by:
+- Testing **new features** before official release.
+- Reporting bugs, crashes, and performance issues.
+- Suggesting **improvements** for the user experience.
+
+📋 **Current Beta Testers**
+- *FedxD* — 🏆 Lead Developer/Creator & Initial Tester
+- *(Add contributors here as they join)*
+
+> ⚠ **Note:** Beta versions may contain **unfinished features** and **experimental changes**.  
+> They are **not recommended** for production environments.
+
+---
+
+### 📜 Contributor Recognition
+All contributors are **credited in the README** and changelog.  
+Significant contributions will be mentioned in **release notes**.
+
+---
+
 
 ## 🙌 Credits
 
